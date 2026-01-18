@@ -1,3 +1,473 @@
+
+Info Asset Register
+/
+can you write me an interactive web app to be used by an nhs trust as an information asset register?
+
+15:36
+I'll create a
+
+can you write me an interactive web app to be used by an nhs trust as an information asset register? the app should be used to record information assets and data flows so two sections will be needed. The app should also contain a user management system where new users can be created by the main admin account. Information assets and data flows will be assigned to specific teams so the ability to select teams is important - individuals can then be assigned to these teams and granted read only or edit permissions to the information assets and data flows relevant automatically. I would like to give the admin the ability to create the forms required for the information assets and data flows directly within the app please if possible? If you need any clarity before creating the app please ask me to ensure I don't burn through my usage as quick as I may if not
+
+15:40
+Great, I have a few clarifying questions to ensure I build exactly what you need:
+
+Core Functionality
+Form Builder: When you say the admin can "create the forms" for information assets and data flows - do you mean:
+A drag-and-drop form builder where admin defines which fields appear (e.g., add a "Data Classification" dropdown, a "Retention Period" text field, etc.)?
+Or pre-defined templates that admin can customise (add/remove/edit fields)?
+Data Flows: Should data flows link to information assets (e.g., "Flow X transfers Asset Y from Team A to Team B"), or are they independent records?
+User & Team Structure
+Team Hierarchy: Can a user belong to multiple teams, or just one?
+Permissions: You mentioned read-only or edit. Should there also be:
+A "submit for approval" workflow?
+An audit trail of who changed what and when?
+Admin Levels: Is there just one super-admin, or do you need team-level admins who can manage their own team's users?
+NHS-Specific
+Data Classifications: Should I pre-populate NHS-standard classifications (e.g., Official, Official-Sensitive, etc.) as defaults in the form builder?
+Export/Reporting: Do you need the ability to export registers to Excel/CSV or generate reports (e.g., for IG toolkit submissions)?
+Technical
+Data Persistence: Since this is a web app I'll create, the data will be stored in browser local storage (resets if you clear browser data). For a production NHS system you'd need a proper backend. Is this acceptable for a prototype/demo, or do you need something more persistent?
+Let me know your preferences and I'll build it accordingly.
+
+pre defined templates, so an information asset template and a data flows template - the administration can then set the required fields for this - perhaps in another section called forms admin that only full administrator accounts have access too?
+data flows can be assigned to info assets but not required
+yes a user can belong to multiple teams
+leave as read-only and edit for the individual teams
+Create a sys admin level which users can be assigned to which gives permission to everything within the system and the ability to edit the forms
+No need to pre define anything.
+Yes please provide ability to export data
+Yes local storage is fine for demo.
+If there any any more clarification points needed please ask before creating app
+
+Show more
+15:44
+Thank you, that's very helpful. Just a few final clarifications:
+
+Forms Admin
+Field Types: What field types should the admin be able to add to forms? I'm thinking:
+Text (single line)
+Text area (multi-line)
+Dropdown (with custom options)
+Date
+Checkbox (yes/no)
+Multi-select (multiple options)
+Are there any others you'd need?
+Field Validation: Should admin be able to mark fields as "required" or "optional"?
+Teams & Assets
+Team Assignment: When creating/editing an information asset or data flow, should the user be able to assign it to:
+One team only?
+Multiple teams?
+Visibility: If an asset is assigned to Team A, can users from Team B see it at all (even read-only), or is it completely hidden from them?
+User Management
+Default Admin: Should I create a default sys admin account (e.g., username: admin, password: admin) for initial login, which can then create other users?
+User Details: What information should be captured for users?
+Username
+Password
+Full name
+Email
+Team assignments
+Role (Sys Admin / Standard User)
+Anything else?
+Data Flows
+Linking to Assets: When linking a data flow to an information asset, should it show all assets in the system, or only assets the user has access to?
+Once you confirm these I'll have everything I need to build it.
+
+yes those types are fine
+yes please
+Each asset and data flow should only be assigned to one team as the owner
+No this shouldn't be possible they should be private
+yes thats great
+yes those are fine
+Assets the user has access to as they should have access all assets within that specific team only
+15:46
+Perfect, I have everything I need. Let me build this for you now.
+
+
+Creating a comprehensive NHS Information Asset Register web application with user management, team-based permissions, form customisation, and export functionality
+index.html
+Continue
+
+15:50
+The file creation is getting quite long. Let me complete it properly:
+
+Failed to edit
+Index
+
+Check what was created
+
+The file didn't get created properly. Let me create it in full:
+
+
+Creating a comprehensive NHS Information Asset Register web application - complete file
+nhs-asset-register.html
+
+Presented file
+I've created your NHS Information Asset Register application. Here's what's included:
+
+Login & Authentication
+
+Default credentials: admin / admin
+System Administrator role with full access
+Standard User role with team-based permissions
+User Management (Sys Admin only)
+
+Create, edit, delete users
+Assign users to multiple teams with read-only or edit permissions
+Team Management (Sys Admin only)
+
+Create and manage teams
+View member counts, asset counts, and data flow counts per team
+Forms Administration (Sys Admin only)
+
+Customise Information Asset and Data Flow form templates
+Field types: text, text area, dropdown, date, checkbox, multi-select
+Mark fields as required/optional
+Information Assets
+
+Add, edit, view, delete assets (based on team permissions)
+Assets are private to their assigned team
+Search and filter by team
+Export to CSV
+Data Flows
+
+Add, edit, view, delete data flows (based on team permissions)
+Optionally link to information assets within the same team
+Search and filter by team
+Export to CSV
+Permissions Logic
+
+Users only see assets/data flows for teams they belong to
+Read-only users can view but not edit
+Edit users can create, modify, and delete
+System Administrators have full access to everything
+Data is stored in browser local storage, so it will persist between sessions but would need a proper backend for production use.
+
+Nhs asset register
+Code · HTML 
+can you change the default forms for me to contain the following:
+
+Information assets:
+Portfolio
+Team (where assignment is managed for services)
+Asset name
+description
+storage location
+date reviewed
+data next review due
+risk score (1-8)
+likelihood of risk (1-8)
+total risk (risk score * likelihood of risk) auto filled
+
+Data flows:
+Portfolio
+Team (where assignment is managed for services)
+Linked to asset (search box to look for available assets)
+description
+description of how data flows
+storage location
+date reviewed
+data next review due
+risk score (1-8)
+likelihood of risk (1-8)
+total risk (risk score * likelihood of risk) auto filled
+
+And then change dashboard page to include some more reports which edit based on assets you have access to? Mainly total assets, total assets in data, total assets due for review - then provide click through options to view these pieces of information?
+
+Show more
+15:59
+
+9 steps
+
+Update viewDataflow to show the calculated Total Risk and format nicely
++45
+-9
+nhs-asset-register.html
+
+Update getAssetDisplayName to use the new field ID for Asset Name
++1
+-1
+nhs-asset-register.html
+Now let me update the export functions to include the new fields properly:
+
+
+1 step
+
+Update exportDataflows to include Total Risk calculation
++22
+-8
+nhs-asset-register.html
+
+Presented file
+I've updated the application with all your requested changes. Here's a summary:
+
+Updated Information Asset Form Fields:
+
+Portfolio, Team, Asset Name, Description, Storage Location, Date Reviewed, Date Next Review Due, Risk Score (1-8 dropdown), Likelihood of Risk (1-8 dropdown), Total Risk (auto-calculated)
+Updated Data Flow Form Fields:
+
+Portfolio, Team, Description, Description of How Data Flows, Storage Location, Date Reviewed, Date Next Review Due, Risk Score (1-8 dropdown), Likelihood of Risk (1-8 dropdown), Total Risk (auto-calculated)
+Enhanced Dashboard with Clickable Reports:
+
+Top Row - Main Stats (clickable to navigate):
+
+Total Assets → clicks through to Assets list
+Total Data Flows → clicks through to Data Flows list
+Teams → clicks through to Team Management
+Users → clicks through to User Management
+Asset Review Status (clickable filters):
+
+Assets Overdue for Review (red) → filters to show only overdue
+Assets Due Within 30 Days (yellow) → filters to show due soon
+Assets Up to Date (green) → filters to show reviewed
+Data Flow Review Status (clickable filters):
+
+Same three categories as assets
+Risk Overview Panels:
+
+Asset Risk Overview showing High (49-64), Medium (25-48), Low (1-24) counts
+Data Flow Risk Overview with same breakdown
+Other Improvements:
+
+Total Risk auto-calculates when you select Risk Score and Likelihood
+Table views show Next Review date with colour-coded status icons
+Total Risk displays with colour coding in tables
+View modals show calculated Total Risk with risk level label
+CSV exports include the calculated Total Risk
+Note: Since this uses local storage, you may need to clear your browser's local storage to see the new default form fields if you had previously used the app.
+
+Nhs asset register
+Code · HTML 
+One more change, on both forms the owner team should be the only option for team, no need to provide another option for people to type something in here
+
+16:05
+
+Remove the Team text field from asset form fields since Owner Team dropdown already handles this
++30
+-32
+nhs-asset-register.html
+
+Presented file
+Done. I've removed the separate "Team" text field from both the Information Asset and Data Flow forms. The "Owner Team" dropdown at the top of each form is now the only way to assign a team, which makes sense since that's what controls permissions and visibility anyway.
+
+Nhs asset register
+Code · HTML 
+can you help me deploy this via github so I have a version hosted I can access and test
+
+16:09
+Absolutely! I can guide you through deploying this using GitHub Pages, which is free and straightforward. Here's how to do it:
+
+Step 1: Create a GitHub Account (if you don't have one)
+
+Go to https://github.com and sign up
+Step 2: Create a New Repository
+
+Click the + icon in the top right → New repository
+Name it something like nhs-asset-register
+Set it to Public (required for free GitHub Pages)
+Check Add a README file
+Click Create repository
+Step 3: Upload the HTML File
+
+In your new repository, click Add file → Upload files
+Drag and drop the nhs-asset-register.html file you downloaded
+Important: Rename the file to index.html (GitHub Pages looks for this filename)
+You can do this before uploading, or after by clicking the file → pencil icon → change the filename at the top
+Click Commit changes
+Step 4: Enable GitHub Pages
+
+Go to your repository's Settings (tab at the top)
+Scroll down to Pages in the left sidebar
+Under Source, select Deploy from a branch
+Under Branch, select main and / (root)
+Click Save
+Step 5: Access Your Site
+
+Wait 1-2 minutes for deployment
+Your site will be live at: https://[your-username].github.io/nhs-asset-register/
+Would you like me to create a ready-to-use repository package with the file already named index.html and a README with instructions? That would make it even easier to upload.
+
+can you remove the default admin and password from the main screen
+
+16:11
+
+Remove the default admin/password hint from the login screen
++4
+-5
+nhs-asset-register.html
+
+Presented file
+Done - the default credentials hint has been removed from the login screen. The login still works with admin / admin, it's just no longer displayed publicly.
+
+Nhs asset register
+Code · HTML 
+The site for my hosted app is: https://karlvincent7-cpu.github.io/Info-asset-register/#
+
+Just putting this here as a place holder as I will now be doing some testing. Default admin is: admin/admin too keeping this here as only I have access
+
+16:14
+Noted - I've saved that for reference:
+
+Live Site: https://karlvincent7-cpu.github.io/Info-asset-register/#
+
+Default Admin: admin / admin
+
+Let me know when you've finished testing and if you need any changes, bug fixes, or new features. Happy to help!
+
+my next step is to try make it reactive so that is scales for iphone screen usage, is this possible?
+
+16:15
+Yes, absolutely! The app already uses Tailwind CSS which has responsive utilities built in, but it needs some adjustments to work well on mobile screens. The main issues will be:
+
+Sidebar - needs to collapse into a hamburger menu on mobile
+Tables - need to scroll horizontally or stack on small screens
+Modals - need better sizing for mobile
+Dashboard cards - need to stack properly
+Would you like me to make these responsive changes now? I'll:
+
+Add a hamburger menu button that shows/hides the sidebar on mobile
+Make the sidebar overlay the screen on mobile rather than push content
+Ensure tables scroll horizontally on small screens
+Adjust padding and font sizes for mobile
+Make sure modals are full-width on small screens
+Ensure dashboard stat cards stack nicely
+Just confirm and I'll update the app for you.
+
+sure
+
+16:15
+
+Hide steps
+
+Update the top navigation to include a hamburger menu button for mobile
++17
+-14
+nhs-asset-register.html
+
+Update the sidebar to be responsive with overlay on mobile
++33
+-29
+nhs-asset-register.html
+
+Update dashboard section for mobile responsiveness
++172
+-172
+nhs-asset-register.html
+
+Update Information Assets section for mobile responsiveness
++35
+-35
+nhs-asset-register.html
+
+Update Data Flows section for mobile responsiveness
++35
+-35
+nhs-asset-register.html
+
+Update User Management section for mobile responsiveness
++26
+-26
+nhs-asset-register.html
+
+Update Team Management section for mobile responsiveness
++26
+-26
+nhs-asset-register.html
+
+Update Forms Admin section for mobile responsiveness
++28
+-28
+nhs-asset-register.html
+Now let me update the modals for mobile and add the sidebar toggle functions:
+
+
+Update User Modal for mobile responsiveness
++44
+-44
+nhs-asset-register.html
+Update other modals for mobile responsiveness
++154
+-72
+Continue
+
+16:19
+Let me find the exact text to replace for the modals:
+
+
+4 steps
+
+View the remaining modals
+Show working file
+
+Update remaining modals for mobile
++88
+-88
+nhs-asset-register.html
+Now let me add the sidebar toggle JavaScript functions:
+
+
+Add sidebar toggle functions for mobile
++19
+-2
+nhs-asset-register.html
+Now let me update the renderUsers and renderTeams functions to work better on mobile:
+
+
+3 steps
+
+Update renderDataflowsTableWithFilter for mobile responsive columns
++57
+-57
+nhs-asset-register.html
+
+Presented file
+Done! The app is now fully responsive for mobile devices. Here's what I've changed:
+
+Navigation:
+
+Added a hamburger menu button (☰) that appears on mobile
+Sidebar slides in from the left when tapped, with a dark overlay behind it
+Tapping the overlay or a menu item closes the sidebar
+Header text shortened on mobile to fit better
+Dashboard:
+
+Stats cards now display in a 2x2 grid on mobile (4 columns on desktop)
+Smaller fonts and padding on mobile
+"Click to view" hints hidden on mobile to save space
+Tables:
+
+Tables scroll horizontally on small screens
+Some columns hidden on mobile/tablet to prioritise key information:
+Assets: Owner, Asset Name, Risk, Actions always visible; Portfolio and Next Review hidden on smaller screens
+Data Flows: Similar approach
+Users: Full Name and Email hidden on mobile
+Teams: Description, Assets, and Data Flows counts hidden on smaller screens
+Smaller padding and font sizes
+Modals:
+
+All modals now take full width on mobile with small margins
+Sticky headers so you can always see what modal you're in
+Smaller padding and fonts on mobile
+General:
+
+Buttons show icons only on mobile, full text on desktop
+Touch-friendly tap targets (added padding to buttons)
+All form inputs sized appropriately for mobile
+You can now upload this new version to your GitHub repository to replace the existing file. Test it on your iPhone and it should work much better!
+
+Nhs asset register
+Code · HTML 
+
+
+You've hit your session limit ∙ Resets at 8:00 PM
+Keep working
+
+
+
+
+Claude is AI and can make mistakes. Please double-check responses.
+Nhs asset register · HTML
+Copy
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,215 +518,222 @@
     <!-- Main Application -->
     <div id="mainApp" class="hidden">
         <nav class="nhs-blue text-white shadow-lg fixed top-0 left-0 right-0 z-50">
-            <div class="flex items-center justify-between px-6 py-3">
+            <div class="flex items-center justify-between px-4 md:px-6 py-3">
                 <div class="flex items-center space-x-3">
-                    <i class="fas fa-hospital text-xl"></i>
-                    <span class="font-bold text-lg">NHS Information Asset Register</span>
+                    <button onclick="toggleSidebar()" class="md:hidden text-white p-1 mr-2">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <i class="fas fa-hospital text-xl hidden md:block"></i>
+                    <span class="font-bold text-lg">NHS Asset Register</span>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <span id="currentUserDisplay" class="text-sm"></span>
-                    <button onclick="logout()" class="bg-white/20 hover:bg-white/30 px-4 py-1.5 rounded text-sm transition">
-                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                <div class="flex items-center space-x-2 md:space-x-4">
+                    <span id="currentUserDisplay" class="text-xs md:text-sm truncate max-w-[120px] md:max-w-none"></span>
+                    <button onclick="logout()" class="bg-white/20 hover:bg-white/30 px-3 md:px-4 py-1.5 rounded text-sm transition">
+                        <i class="fas fa-sign-out-alt md:mr-2"></i><span class="hidden md:inline">Logout</span>
                     </button>
                 </div>
             </div>
         </nav>
 
         <div class="flex pt-14">
-            <aside class="nhs-blue w-64 min-h-screen fixed left-0 top-14 overflow-y-auto">
+            <!-- Mobile Overlay -->
+            <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden"></div>
+            
+            <!-- Sidebar -->
+            <aside id="sidebar" class="nhs-blue w-64 min-h-screen fixed left-0 top-14 overflow-y-auto z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
                 <nav class="py-4">
                     <div class="px-4 mb-2 text-blue-200 text-xs font-semibold uppercase tracking-wider">Main Menu</div>
-                    <a href="#" onclick="showSection('dashboard')" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="dashboard">
+                    <a href="#" onclick="showSection('dashboard'); closeSidebarMobile()" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="dashboard">
                         <i class="fas fa-tachometer-alt w-6"></i><span>Dashboard</span>
                     </a>
-                    <a href="#" onclick="showSection('assets')" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="assets">
+                    <a href="#" onclick="showSection('assets'); closeSidebarMobile()" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="assets">
                         <i class="fas fa-database w-6"></i><span>Information Assets</span>
                     </a>
-                    <a href="#" onclick="showSection('dataflows')" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="dataflows">
+                    <a href="#" onclick="showSection('dataflows'); closeSidebarMobile()" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="dataflows">
                         <i class="fas fa-exchange-alt w-6"></i><span>Data Flows</span>
                     </a>
                     <div id="adminMenu" class="hidden">
                         <div class="px-4 mt-6 mb-2 text-blue-200 text-xs font-semibold uppercase tracking-wider">Administration</div>
-                        <a href="#" onclick="showSection('users')" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="users">
+                        <a href="#" onclick="showSection('users'); closeSidebarMobile()" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="users">
                             <i class="fas fa-users w-6"></i><span>User Management</span>
                         </a>
-                        <a href="#" onclick="showSection('teams')" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="teams">
+                        <a href="#" onclick="showSection('teams'); closeSidebarMobile()" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="teams">
                             <i class="fas fa-user-friends w-6"></i><span>Team Management</span>
                         </a>
-                        <a href="#" onclick="showSection('forms')" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="forms">
+                        <a href="#" onclick="showSection('forms'); closeSidebarMobile()" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="forms">
                             <i class="fas fa-wpforms w-6"></i><span>Forms Admin</span>
                         </a>
                     </div>
                 </nav>
             </aside>
 
-            <main class="ml-64 flex-1 p-6">
+            <main class="w-full md:ml-64 flex-1 p-4 md:p-6">
                 <!-- Dashboard -->
                 <section id="dashboardSection" class="section fade-in">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Dashboard</h2>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6">Dashboard</h2>
                     
                     <!-- Main Stats Row -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                        <div onclick="showSection('assets')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-4 md:mb-6">
+                        <div onclick="showSection('assets')" class="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1">
                             <div class="flex items-center justify-between">
-                                <div><p class="text-gray-500 text-sm">Total Assets</p><p id="statAssets" class="text-3xl font-bold text-nhs-blue">0</p></div>
-                                <div class="w-12 h-12 nhs-blue rounded-full flex items-center justify-center"><i class="fas fa-database text-white"></i></div>
+                                <div><p class="text-gray-500 text-xs md:text-sm">Total Assets</p><p id="statAssets" class="text-2xl md:text-3xl font-bold text-nhs-blue">0</p></div>
+                                <div class="w-10 h-10 md:w-12 md:h-12 nhs-blue rounded-full flex items-center justify-center"><i class="fas fa-database text-white text-sm md:text-base"></i></div>
                             </div>
-                            <p class="text-xs text-gray-400 mt-2">Click to view all</p>
+                            <p class="text-xs text-gray-400 mt-1 md:mt-2 hidden md:block">Click to view all</p>
                         </div>
-                        <div onclick="showSection('dataflows')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1">
+                        <div onclick="showSection('dataflows')" class="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1">
                             <div class="flex items-center justify-between">
-                                <div><p class="text-gray-500 text-sm">Total Data Flows</p><p id="statDataflows" class="text-3xl font-bold text-nhs-blue">0</p></div>
-                                <div class="w-12 h-12 nhs-blue rounded-full flex items-center justify-center"><i class="fas fa-exchange-alt text-white"></i></div>
+                                <div><p class="text-gray-500 text-xs md:text-sm">Total Data Flows</p><p id="statDataflows" class="text-2xl md:text-3xl font-bold text-nhs-blue">0</p></div>
+                                <div class="w-10 h-10 md:w-12 md:h-12 nhs-blue rounded-full flex items-center justify-center"><i class="fas fa-exchange-alt text-white text-sm md:text-base"></i></div>
                             </div>
-                            <p class="text-xs text-gray-400 mt-2">Click to view all</p>
+                            <p class="text-xs text-gray-400 mt-1 md:mt-2 hidden md:block">Click to view all</p>
                         </div>
-                        <div onclick="showSection('teams')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1">
+                        <div onclick="showSection('teams')" class="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1">
                             <div class="flex items-center justify-between">
-                                <div><p class="text-gray-500 text-sm">Teams</p><p id="statTeams" class="text-3xl font-bold text-nhs-blue">0</p></div>
-                                <div class="w-12 h-12 nhs-blue rounded-full flex items-center justify-center"><i class="fas fa-user-friends text-white"></i></div>
+                                <div><p class="text-gray-500 text-xs md:text-sm">Teams</p><p id="statTeams" class="text-2xl md:text-3xl font-bold text-nhs-blue">0</p></div>
+                                <div class="w-10 h-10 md:w-12 md:h-12 nhs-blue rounded-full flex items-center justify-center"><i class="fas fa-user-friends text-white text-sm md:text-base"></i></div>
                             </div>
-                            <p class="text-xs text-gray-400 mt-2">Click to manage</p>
+                            <p class="text-xs text-gray-400 mt-1 md:mt-2 hidden md:block">Click to manage</p>
                         </div>
-                        <div onclick="showSection('users')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1">
+                        <div onclick="showSection('users')" class="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1">
                             <div class="flex items-center justify-between">
-                                <div><p class="text-gray-500 text-sm">Users</p><p id="statUsers" class="text-3xl font-bold text-nhs-blue">0</p></div>
-                                <div class="w-12 h-12 nhs-blue rounded-full flex items-center justify-center"><i class="fas fa-users text-white"></i></div>
+                                <div><p class="text-gray-500 text-xs md:text-sm">Users</p><p id="statUsers" class="text-2xl md:text-3xl font-bold text-nhs-blue">0</p></div>
+                                <div class="w-10 h-10 md:w-12 md:h-12 nhs-blue rounded-full flex items-center justify-center"><i class="fas fa-users text-white text-sm md:text-base"></i></div>
                             </div>
-                            <p class="text-xs text-gray-400 mt-2">Click to manage</p>
+                            <p class="text-xs text-gray-400 mt-1 md:mt-2 hidden md:block">Click to manage</p>
                         </div>
                     </div>
 
                     <!-- Review Status Row -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <div onclick="filterDashboardAssets('overdue')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-red-500">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 mb-4 md:mb-6">
+                        <div onclick="filterDashboardAssets('overdue')" class="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-red-500">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500 text-sm">Assets Overdue for Review</p>
-                                    <p id="statAssetsOverdue" class="text-3xl font-bold text-red-600">0</p>
+                                    <p class="text-gray-500 text-xs md:text-sm">Assets Overdue for Review</p>
+                                    <p id="statAssetsOverdue" class="text-2xl md:text-3xl font-bold text-red-600">0</p>
                                 </div>
-                                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-exclamation-triangle text-red-600"></i>
+                                <div class="w-10 h-10 md:w-12 md:h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-exclamation-triangle text-red-600 text-sm md:text-base"></i>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-400 mt-2">Click to view overdue assets</p>
+                            <p class="text-xs text-gray-400 mt-1 md:mt-2 hidden md:block">Click to view overdue assets</p>
                         </div>
-                        <div onclick="filterDashboardAssets('due-soon')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-yellow-500">
+                        <div onclick="filterDashboardAssets('due-soon')" class="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-yellow-500">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500 text-sm">Assets Due Within 30 Days</p>
-                                    <p id="statAssetsDueSoon" class="text-3xl font-bold text-yellow-600">0</p>
+                                    <p class="text-gray-500 text-xs md:text-sm">Assets Due Within 30 Days</p>
+                                    <p id="statAssetsDueSoon" class="text-2xl md:text-3xl font-bold text-yellow-600">0</p>
                                 </div>
-                                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-clock text-yellow-600"></i>
+                                <div class="w-10 h-10 md:w-12 md:h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-clock text-yellow-600 text-sm md:text-base"></i>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-400 mt-2">Click to view assets due soon</p>
+                            <p class="text-xs text-gray-400 mt-1 md:mt-2 hidden md:block">Click to view assets due soon</p>
                         </div>
-                        <div onclick="filterDashboardAssets('reviewed')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-green-500">
+                        <div onclick="filterDashboardAssets('reviewed')" class="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-green-500">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500 text-sm">Assets Up to Date</p>
-                                    <p id="statAssetsUpToDate" class="text-3xl font-bold text-green-600">0</p>
+                                    <p class="text-gray-500 text-xs md:text-sm">Assets Up to Date</p>
+                                    <p id="statAssetsUpToDate" class="text-2xl md:text-3xl font-bold text-green-600">0</p>
                                 </div>
-                                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-check-circle text-green-600"></i>
+                                <div class="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check-circle text-green-600 text-sm md:text-base"></i>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-400 mt-2">Click to view up-to-date assets</p>
+                            <p class="text-xs text-gray-400 mt-1 md:mt-2 hidden md:block">Click to view up-to-date assets</p>
                         </div>
                     </div>
 
                     <!-- Data Flow Review Status Row -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <div onclick="filterDashboardDataflows('overdue')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-red-400">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 mb-4 md:mb-6">
+                        <div onclick="filterDashboardDataflows('overdue')" class="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-red-400">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500 text-sm">Data Flows Overdue for Review</p>
-                                    <p id="statDataflowsOverdue" class="text-3xl font-bold text-red-500">0</p>
+                                    <p class="text-gray-500 text-xs md:text-sm">Data Flows Overdue for Review</p>
+                                    <p id="statDataflowsOverdue" class="text-2xl md:text-3xl font-bold text-red-500">0</p>
                                 </div>
-                                <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-exclamation-circle text-red-500"></i>
+                                <div class="w-10 h-10 md:w-12 md:h-12 bg-red-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-exclamation-circle text-red-500 text-sm md:text-base"></i>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-400 mt-2">Click to view overdue data flows</p>
+                            <p class="text-xs text-gray-400 mt-1 md:mt-2 hidden md:block">Click to view overdue data flows</p>
                         </div>
-                        <div onclick="filterDashboardDataflows('due-soon')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-yellow-400">
+                        <div onclick="filterDashboardDataflows('due-soon')" class="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-yellow-400">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500 text-sm">Data Flows Due Within 30 Days</p>
-                                    <p id="statDataflowsDueSoon" class="text-3xl font-bold text-yellow-500">0</p>
+                                    <p class="text-gray-500 text-xs md:text-sm">Data Flows Due Within 30 Days</p>
+                                    <p id="statDataflowsDueSoon" class="text-2xl md:text-3xl font-bold text-yellow-500">0</p>
                                 </div>
-                                <div class="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-hourglass-half text-yellow-500"></i>
+                                <div class="w-10 h-10 md:w-12 md:h-12 bg-yellow-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-hourglass-half text-yellow-500 text-sm md:text-base"></i>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-400 mt-2">Click to view data flows due soon</p>
+                            <p class="text-xs text-gray-400 mt-1 md:mt-2 hidden md:block">Click to view data flows due soon</p>
                         </div>
-                        <div onclick="filterDashboardDataflows('reviewed')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-green-400">
+                        <div onclick="filterDashboardDataflows('reviewed')" class="bg-white rounded-lg shadow p-4 md:p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-green-400">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-gray-500 text-sm">Data Flows Up to Date</p>
-                                    <p id="statDataflowsUpToDate" class="text-3xl font-bold text-green-500">0</p>
+                                    <p class="text-gray-500 text-xs md:text-sm">Data Flows Up to Date</p>
+                                    <p id="statDataflowsUpToDate" class="text-2xl md:text-3xl font-bold text-green-500">0</p>
                                 </div>
-                                <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-check text-green-500"></i>
+                                <div class="w-10 h-10 md:w-12 md:h-12 bg-green-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-500 text-sm md:text-base"></i>
                                 </div>
                             </div>
-                            <p class="text-xs text-gray-400 mt-2">Click to view up-to-date data flows</p>
+                            <p class="text-xs text-gray-400 mt-1 md:mt-2 hidden md:block">Click to view up-to-date data flows</p>
                         </div>
                     </div>
 
                     <!-- Risk Overview -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Asset Risk Overview</h3>
-                            <div class="space-y-3">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-6 mb-4 md:mb-6">
+                        <div class="bg-white rounded-lg shadow p-4 md:p-6">
+                            <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Asset Risk Overview</h3>
+                            <div class="space-y-2 md:space-y-3">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600">High Risk (49-64)</span>
-                                    <span id="riskHigh" class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">0</span>
+                                    <span class="text-xs md:text-sm text-gray-600">High Risk (49-64)</span>
+                                    <span id="riskHigh" class="px-2 md:px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs md:text-sm font-medium">0</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600">Medium Risk (25-48)</span>
-                                    <span id="riskMedium" class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">0</span>
+                                    <span class="text-xs md:text-sm text-gray-600">Medium Risk (25-48)</span>
+                                    <span id="riskMedium" class="px-2 md:px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs md:text-sm font-medium">0</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600">Low Risk (1-24)</span>
-                                    <span id="riskLow" class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">0</span>
+                                    <span class="text-xs md:text-sm text-gray-600">Low Risk (1-24)</span>
+                                    <span id="riskLow" class="px-2 md:px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs md:text-sm font-medium">0</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Data Flow Risk Overview</h3>
-                            <div class="space-y-3">
+                        <div class="bg-white rounded-lg shadow p-4 md:p-6">
+                            <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Data Flow Risk Overview</h3>
+                            <div class="space-y-2 md:space-y-3">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600">High Risk (49-64)</span>
-                                    <span id="dfRiskHigh" class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">0</span>
+                                    <span class="text-xs md:text-sm text-gray-600">High Risk (49-64)</span>
+                                    <span id="dfRiskHigh" class="px-2 md:px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs md:text-sm font-medium">0</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600">Medium Risk (25-48)</span>
-                                    <span id="dfRiskMedium" class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">0</span>
+                                    <span class="text-xs md:text-sm text-gray-600">Medium Risk (25-48)</span>
+                                    <span id="dfRiskMedium" class="px-2 md:px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs md:text-sm font-medium">0</span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-600">Low Risk (1-24)</span>
-                                    <span id="dfRiskLow" class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">0</span>
+                                    <span class="text-xs md:text-sm text-gray-600">Low Risk (1-24)</span>
+                                    <span id="dfRiskLow" class="px-2 md:px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs md:text-sm font-medium">0</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">My Teams</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-6">
+                        <div class="bg-white rounded-lg shadow p-4 md:p-6">
+                            <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">My Teams</h3>
                             <div id="myTeamsList" class="space-y-2"></div>
                         </div>
-                        <div class="bg-white rounded-lg shadow p-6">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
+                        <div class="bg-white rounded-lg shadow p-4 md:p-6">
+                            <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Quick Actions</h3>
                             <div class="space-y-2">
-                                <button onclick="showSection('assets'); setTimeout(() => openAssetModal(), 100)" class="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                                <button onclick="showSection('assets'); setTimeout(() => openAssetModal(), 100)" class="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition text-sm md:text-base">
                                     <i class="fas fa-plus text-nhs-blue mr-2"></i>Add Information Asset
                                 </button>
-                                <button onclick="showSection('dataflows'); setTimeout(() => openDataflowModal(), 100)" class="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                                <button onclick="showSection('dataflows'); setTimeout(() => openDataflowModal(), 100)" class="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition text-sm md:text-base">
                                     <i class="fas fa-plus text-nhs-blue mr-2"></i>Add Data Flow
                                 </button>
                             </div>
@@ -266,95 +743,95 @@
 
                 <!-- Information Assets -->
                 <section id="assetsSection" class="section hidden fade-in">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">Information Assets</h2>
-                        <div class="flex space-x-3">
-                            <button onclick="exportAssets()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                                <i class="fas fa-download mr-2"></i>Export CSV
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-6 gap-3">
+                        <h2 class="text-xl md:text-2xl font-bold text-gray-800">Information Assets</h2>
+                        <div class="flex space-x-2 md:space-x-3">
+                            <button onclick="exportAssets()" class="bg-green-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm">
+                                <i class="fas fa-download md:mr-2"></i><span class="hidden md:inline">Export CSV</span>
                             </button>
-                            <button onclick="openAssetModal()" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                                <i class="fas fa-plus mr-2"></i>Add Asset
+                            <button onclick="openAssetModal()" class="nhs-blue text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">
+                                <i class="fas fa-plus md:mr-2"></i><span class="hidden md:inline">Add Asset</span>
                             </button>
                         </div>
                     </div>
                     <div class="bg-white rounded-lg shadow overflow-hidden">
-                        <div class="p-4 border-b">
-                            <div class="flex items-center space-x-4">
+                        <div class="p-3 md:p-4 border-b">
+                            <div class="flex flex-col md:flex-row md:items-center gap-2 md:space-x-4">
                                 <div class="flex-1">
-                                    <input type="text" id="assetSearch" onkeyup="filterAssets()" placeholder="Search assets..." class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                    <input type="text" id="assetSearch" onkeyup="filterAssets()" placeholder="Search assets..." class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm">
                                 </div>
-                                <select id="assetTeamFilter" onchange="filterAssets()" class="px-4 py-2 border border-gray-300 rounded-lg">
+                                <select id="assetTeamFilter" onchange="filterAssets()" class="px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm">
                                     <option value="">All Teams</option>
                                 </select>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full">
+                            <table class="w-full text-sm">
                                 <thead class="bg-gray-50"><tr id="assetsTableHeader"></tr></thead>
                                 <tbody id="assetsTableBody" class="divide-y divide-gray-200"></tbody>
                             </table>
                         </div>
-                        <div id="noAssetsMessage" class="p-8 text-center text-gray-500 hidden">
-                            <i class="fas fa-database text-4xl mb-3"></i><p>No information assets found</p>
+                        <div id="noAssetsMessage" class="p-6 md:p-8 text-center text-gray-500 hidden">
+                            <i class="fas fa-database text-3xl md:text-4xl mb-3"></i><p>No information assets found</p>
                         </div>
                     </div>
                 </section>
 
                 <!-- Data Flows -->
                 <section id="dataflowsSection" class="section hidden fade-in">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">Data Flows</h2>
-                        <div class="flex space-x-3">
-                            <button onclick="exportDataflows()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                                <i class="fas fa-download mr-2"></i>Export CSV
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-6 gap-3">
+                        <h2 class="text-xl md:text-2xl font-bold text-gray-800">Data Flows</h2>
+                        <div class="flex space-x-2 md:space-x-3">
+                            <button onclick="exportDataflows()" class="bg-green-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm">
+                                <i class="fas fa-download md:mr-2"></i><span class="hidden md:inline">Export CSV</span>
                             </button>
-                            <button onclick="openDataflowModal()" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                                <i class="fas fa-plus mr-2"></i>Add Data Flow
+                            <button onclick="openDataflowModal()" class="nhs-blue text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">
+                                <i class="fas fa-plus md:mr-2"></i><span class="hidden md:inline">Add Data Flow</span>
                             </button>
                         </div>
                     </div>
                     <div class="bg-white rounded-lg shadow overflow-hidden">
-                        <div class="p-4 border-b">
-                            <div class="flex items-center space-x-4">
+                        <div class="p-3 md:p-4 border-b">
+                            <div class="flex flex-col md:flex-row md:items-center gap-2 md:space-x-4">
                                 <div class="flex-1">
-                                    <input type="text" id="dataflowSearch" onkeyup="filterDataflows()" placeholder="Search data flows..." class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                    <input type="text" id="dataflowSearch" onkeyup="filterDataflows()" placeholder="Search data flows..." class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm">
                                 </div>
-                                <select id="dataflowTeamFilter" onchange="filterDataflows()" class="px-4 py-2 border border-gray-300 rounded-lg">
+                                <select id="dataflowTeamFilter" onchange="filterDataflows()" class="px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm">
                                     <option value="">All Teams</option>
                                 </select>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full">
+                            <table class="w-full text-sm">
                                 <thead class="bg-gray-50"><tr id="dataflowsTableHeader"></tr></thead>
                                 <tbody id="dataflowsTableBody" class="divide-y divide-gray-200"></tbody>
                             </table>
                         </div>
-                        <div id="noDataflowsMessage" class="p-8 text-center text-gray-500 hidden">
-                            <i class="fas fa-exchange-alt text-4xl mb-3"></i><p>No data flows found</p>
+                        <div id="noDataflowsMessage" class="p-6 md:p-8 text-center text-gray-500 hidden">
+                            <i class="fas fa-exchange-alt text-3xl md:text-4xl mb-3"></i><p>No data flows found</p>
                         </div>
                     </div>
                 </section>
 
                 <!-- User Management -->
                 <section id="usersSection" class="section hidden fade-in">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">User Management</h2>
-                        <button onclick="openUserModal()" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-6 gap-3">
+                        <h2 class="text-xl md:text-2xl font-bold text-gray-800">User Management</h2>
+                        <button onclick="openUserModal()" class="nhs-blue text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">
                             <i class="fas fa-plus mr-2"></i>Add User
                         </button>
                     </div>
                     <div class="bg-white rounded-lg shadow overflow-hidden">
                         <div class="overflow-x-auto">
-                            <table class="w-full">
+                            <table class="w-full text-sm">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teams</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                        <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
+                                        <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Full Name</th>
+                                        <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Email</th>
+                                        <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+                                        <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Teams</th>
+                                        <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="usersTableBody" class="divide-y divide-gray-200"></tbody>
@@ -365,23 +842,23 @@
 
                 <!-- Team Management -->
                 <section id="teamsSection" class="section hidden fade-in">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">Team Management</h2>
-                        <button onclick="openTeamModal()" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-6 gap-3">
+                        <h2 class="text-xl md:text-2xl font-bold text-gray-800">Team Management</h2>
+                        <button onclick="openTeamModal()" class="nhs-blue text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">
                             <i class="fas fa-plus mr-2"></i>Add Team
                         </button>
                     </div>
                     <div class="bg-white rounded-lg shadow overflow-hidden">
                         <div class="overflow-x-auto">
-                            <table class="w-full">
+                            <table class="w-full text-sm">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Team Name</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Members</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assets</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data Flows</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                        <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Team Name</th>
+                                        <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Description</th>
+                                        <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Members</th>
+                                        <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Assets</th>
+                                        <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Data Flows</th>
+                                        <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="teamsTableBody" class="divide-y divide-gray-200"></tbody>
@@ -392,26 +869,26 @@
 
                 <!-- Forms Admin -->
                 <section id="formsSection" class="section hidden fade-in">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Forms Administration</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6">Forms Administration</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                         <div class="bg-white rounded-lg shadow">
-                            <div class="p-4 border-b nhs-blue rounded-t-lg">
-                                <h3 class="text-lg font-semibold text-white">Information Asset Form Fields</h3>
+                            <div class="p-3 md:p-4 border-b nhs-blue rounded-t-lg">
+                                <h3 class="text-base md:text-lg font-semibold text-white">Information Asset Form Fields</h3>
                             </div>
-                            <div class="p-4">
+                            <div class="p-3 md:p-4">
                                 <div id="assetFieldsList" class="space-y-2 mb-4"></div>
-                                <button onclick="openFieldModal('asset')" class="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 text-gray-500 hover:border-nhs-blue hover:text-nhs-blue transition">
+                                <button onclick="openFieldModal('asset')" class="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 text-gray-500 hover:border-nhs-blue hover:text-nhs-blue transition text-sm">
                                     <i class="fas fa-plus mr-2"></i>Add Field
                                 </button>
                             </div>
                         </div>
                         <div class="bg-white rounded-lg shadow">
-                            <div class="p-4 border-b nhs-blue rounded-t-lg">
-                                <h3 class="text-lg font-semibold text-white">Data Flow Form Fields</h3>
+                            <div class="p-3 md:p-4 border-b nhs-blue rounded-t-lg">
+                                <h3 class="text-base md:text-lg font-semibold text-white">Data Flow Form Fields</h3>
                             </div>
-                            <div class="p-4">
+                            <div class="p-3 md:p-4">
                                 <div id="dataflowFieldsList" class="space-y-2 mb-4"></div>
-                                <button onclick="openFieldModal('dataflow')" class="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 text-gray-500 hover:border-nhs-blue hover:text-nhs-blue transition">
+                                <button onclick="openFieldModal('dataflow')" class="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 text-gray-500 hover:border-nhs-blue hover:text-nhs-blue transition text-sm">
                                     <i class="fas fa-plus mr-2"></i>Add Field
                                 </button>
                             </div>
@@ -423,92 +900,92 @@
     </div>
 
     <!-- User Modal -->
-    <div id="userModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 fade-in max-h-[90vh] overflow-y-auto">
-            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between">
-                <h3 id="userModalTitle" class="text-lg font-semibold text-white">Add User</h3>
-                <button onclick="closeUserModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+    <div id="userModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-2 md:p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg fade-in max-h-[95vh] overflow-y-auto">
+            <div class="p-3 md:p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0 z-10">
+                <h3 id="userModalTitle" class="text-base md:text-lg font-semibold text-white">Add User</h3>
+                <button onclick="closeUserModal()" class="text-white hover:text-gray-200 p-1"><i class="fas fa-times"></i></button>
             </div>
-            <form id="userForm" class="p-6 space-y-4">
+            <form id="userForm" class="p-4 md:p-6 space-y-3 md:space-y-4">
                 <input type="hidden" id="userId">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Username *</label>
-                    <input type="text" id="userUsername" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                    <input type="text" id="userUsername" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Password *</label>
-                    <input type="password" id="userPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    <input type="password" id="userPassword" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm">
                     <p id="passwordHint" class="text-xs text-gray-500 mt-1 hidden">Leave blank to keep existing password</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-                    <input type="text" id="userFullName" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                    <input type="text" id="userFullName" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                    <input type="email" id="userEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                    <input type="email" id="userEmail" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Role *</label>
-                    <select id="userRole" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                    <select id="userRole" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm" required>
                         <option value="user">Standard User</option>
                         <option value="sysadmin">System Administrator</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Team Assignments</label>
-                    <div id="userTeamAssignments" class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3"></div>
+                    <div id="userTeamAssignments" class="space-y-2 max-h-40 md:max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-2 md:p-3"></div>
                 </div>
-                <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="closeUserModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
-                    <button type="submit" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save User</button>
+                <div class="flex justify-end space-x-2 md:space-x-3 pt-3 md:pt-4">
+                    <button type="button" onclick="closeUserModal()" class="px-3 md:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Cancel</button>
+                    <button type="submit" class="nhs-blue text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">Save User</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Team Modal -->
-    <div id="teamModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 fade-in">
-            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between">
-                <h3 id="teamModalTitle" class="text-lg font-semibold text-white">Add Team</h3>
-                <button onclick="closeTeamModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+    <div id="teamModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-2 md:p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md fade-in">
+            <div class="p-3 md:p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between">
+                <h3 id="teamModalTitle" class="text-base md:text-lg font-semibold text-white">Add Team</h3>
+                <button onclick="closeTeamModal()" class="text-white hover:text-gray-200 p-1"><i class="fas fa-times"></i></button>
             </div>
-            <form id="teamForm" class="p-6 space-y-4">
+            <form id="teamForm" class="p-4 md:p-6 space-y-3 md:space-y-4">
                 <input type="hidden" id="teamId">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Team Name *</label>
-                    <input type="text" id="teamName" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                    <input type="text" id="teamName" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea id="teamDescription" class="w-full px-4 py-2 border border-gray-300 rounded-lg" rows="3"></textarea>
+                    <textarea id="teamDescription" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm" rows="3"></textarea>
                 </div>
-                <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="closeTeamModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
-                    <button type="submit" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Team</button>
+                <div class="flex justify-end space-x-2 md:space-x-3 pt-3 md:pt-4">
+                    <button type="button" onclick="closeTeamModal()" class="px-3 md:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Cancel</button>
+                    <button type="submit" class="nhs-blue text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">Save Team</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Field Modal -->
-    <div id="fieldModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 fade-in">
-            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between">
-                <h3 id="fieldModalTitle" class="text-lg font-semibold text-white">Add Field</h3>
-                <button onclick="closeFieldModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+    <div id="fieldModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-2 md:p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md fade-in max-h-[95vh] overflow-y-auto">
+            <div class="p-3 md:p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0 z-10">
+                <h3 id="fieldModalTitle" class="text-base md:text-lg font-semibold text-white">Add Field</h3>
+                <button onclick="closeFieldModal()" class="text-white hover:text-gray-200 p-1"><i class="fas fa-times"></i></button>
             </div>
-            <form id="fieldForm" class="p-6 space-y-4">
+            <form id="fieldForm" class="p-4 md:p-6 space-y-3 md:space-y-4">
                 <input type="hidden" id="fieldId">
                 <input type="hidden" id="fieldFormType">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Field Label *</label>
-                    <input type="text" id="fieldLabel" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                    <input type="text" id="fieldLabel" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Field Type *</label>
-                    <select id="fieldType" onchange="toggleOptionsField()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                    <select id="fieldType" onchange="toggleOptionsField()" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm" required>
                         <option value="text">Text (Single Line)</option>
                         <option value="textarea">Text Area (Multi-line)</option>
                         <option value="dropdown">Dropdown</option>
@@ -519,104 +996,104 @@
                 </div>
                 <div id="optionsContainer" class="hidden">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Options (one per line) *</label>
-                    <textarea id="fieldOptions" class="w-full px-4 py-2 border border-gray-300 rounded-lg" rows="4" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
+                    <textarea id="fieldOptions" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm" rows="4" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
                 </div>
                 <div class="flex items-center">
                     <input type="checkbox" id="fieldRequired" class="mr-2">
                     <label for="fieldRequired" class="text-sm text-gray-700">Required field</label>
                 </div>
-                <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="closeFieldModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
-                    <button type="submit" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Field</button>
+                <div class="flex justify-end space-x-2 md:space-x-3 pt-3 md:pt-4">
+                    <button type="button" onclick="closeFieldModal()" class="px-3 md:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Cancel</button>
+                    <button type="submit" class="nhs-blue text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">Save Field</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Asset Modal -->
-    <div id="assetModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 fade-in max-h-[90vh] overflow-y-auto">
-            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0">
-                <h3 id="assetModalTitle" class="text-lg font-semibold text-white">Add Information Asset</h3>
-                <button onclick="closeAssetModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+    <div id="assetModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-2 md:p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl fade-in max-h-[95vh] overflow-y-auto">
+            <div class="p-3 md:p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0 z-10">
+                <h3 id="assetModalTitle" class="text-base md:text-lg font-semibold text-white">Add Information Asset</h3>
+                <button onclick="closeAssetModal()" class="text-white hover:text-gray-200 p-1"><i class="fas fa-times"></i></button>
             </div>
-            <form id="assetForm" class="p-6 space-y-4">
+            <form id="assetForm" class="p-4 md:p-6 space-y-3 md:space-y-4">
                 <input type="hidden" id="assetId">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Owner Team *</label>
-                    <select id="assetTeam" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></select>
+                    <select id="assetTeam" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm" required></select>
                 </div>
                 <div id="assetDynamicFields"></div>
-                <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="closeAssetModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
-                    <button type="submit" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Asset</button>
+                <div class="flex justify-end space-x-2 md:space-x-3 pt-3 md:pt-4">
+                    <button type="button" onclick="closeAssetModal()" class="px-3 md:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Cancel</button>
+                    <button type="submit" class="nhs-blue text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">Save Asset</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Data Flow Modal -->
-    <div id="dataflowModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 fade-in max-h-[90vh] overflow-y-auto">
-            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0">
-                <h3 id="dataflowModalTitle" class="text-lg font-semibold text-white">Add Data Flow</h3>
-                <button onclick="closeDataflowModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+    <div id="dataflowModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-2 md:p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl fade-in max-h-[95vh] overflow-y-auto">
+            <div class="p-3 md:p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0 z-10">
+                <h3 id="dataflowModalTitle" class="text-base md:text-lg font-semibold text-white">Add Data Flow</h3>
+                <button onclick="closeDataflowModal()" class="text-white hover:text-gray-200 p-1"><i class="fas fa-times"></i></button>
             </div>
-            <form id="dataflowForm" class="p-6 space-y-4">
+            <form id="dataflowForm" class="p-4 md:p-6 space-y-3 md:space-y-4">
                 <input type="hidden" id="dataflowId">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Owner Team *</label>
-                    <select id="dataflowTeam" onchange="updateLinkedAssetOptions()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></select>
+                    <select id="dataflowTeam" onchange="updateLinkedAssetOptions()" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm" required></select>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Linked Information Asset</label>
-                    <select id="dataflowLinkedAsset" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    <select id="dataflowLinkedAsset" class="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg text-sm">
                         <option value="">-- None --</option>
                     </select>
                 </div>
                 <div id="dataflowDynamicFields"></div>
-                <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="closeDataflowModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
-                    <button type="submit" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Data Flow</button>
+                <div class="flex justify-end space-x-2 md:space-x-3 pt-3 md:pt-4">
+                    <button type="button" onclick="closeDataflowModal()" class="px-3 md:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Cancel</button>
+                    <button type="submit" class="nhs-blue text-white px-3 md:px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">Save Data Flow</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- View Asset Modal -->
-    <div id="viewAssetModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 fade-in max-h-[90vh] overflow-y-auto">
-            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0">
-                <h3 class="text-lg font-semibold text-white">View Information Asset</h3>
-                <button onclick="closeViewAssetModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+    <div id="viewAssetModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-2 md:p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl fade-in max-h-[95vh] overflow-y-auto">
+            <div class="p-3 md:p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0 z-10">
+                <h3 class="text-base md:text-lg font-semibold text-white">View Information Asset</h3>
+                <button onclick="closeViewAssetModal()" class="text-white hover:text-gray-200 p-1"><i class="fas fa-times"></i></button>
             </div>
-            <div id="viewAssetContent" class="p-6"></div>
+            <div id="viewAssetContent" class="p-4 md:p-6 text-sm"></div>
         </div>
     </div>
 
     <!-- View Data Flow Modal -->
-    <div id="viewDataflowModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 fade-in max-h-[90vh] overflow-y-auto">
-            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0">
-                <h3 class="text-lg font-semibold text-white">View Data Flow</h3>
-                <button onclick="closeViewDataflowModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+    <div id="viewDataflowModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-2 md:p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl fade-in max-h-[95vh] overflow-y-auto">
+            <div class="p-3 md:p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0 z-10">
+                <h3 class="text-base md:text-lg font-semibold text-white">View Data Flow</h3>
+                <button onclick="closeViewDataflowModal()" class="text-white hover:text-gray-200 p-1"><i class="fas fa-times"></i></button>
             </div>
-            <div id="viewDataflowContent" class="p-6"></div>
+            <div id="viewDataflowContent" class="p-4 md:p-6 text-sm"></div>
         </div>
     </div>
 
     <!-- Confirmation Modal -->
-    <div id="confirmModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-sm mx-4 fade-in">
-            <div class="p-6 text-center">
-                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+    <div id="confirmModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-2 md:p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-sm fade-in">
+            <div class="p-4 md:p-6 text-center">
+                <div class="w-14 h-14 md:w-16 md:h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl md:text-2xl"></i>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">Confirm Delete</h3>
-                <p id="confirmMessage" class="text-gray-600 mb-6"></p>
-                <div class="flex justify-center space-x-3">
-                    <button onclick="closeConfirmModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
-                    <button id="confirmDeleteBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Delete</button>
+                <h3 class="text-base md:text-lg font-semibold text-gray-800 mb-2">Confirm Delete</h3>
+                <p id="confirmMessage" class="text-gray-600 mb-4 md:mb-6 text-sm"></p>
+                <div class="flex justify-center space-x-2 md:space-x-3">
+                    <button onclick="closeConfirmModal()" class="px-3 md:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">Cancel</button>
+                    <button id="confirmDeleteBtn" class="bg-red-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-red-700 text-sm">Delete</button>
                 </div>
             </div>
         </div>
@@ -660,6 +1137,23 @@
 
         function saveData() { localStorage.setItem('nhsAssetRegister', JSON.stringify(data)); }
         function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
+
+        // Sidebar toggle for mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+        
+        function closeSidebarMobile() {
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
 
         // Auth
         document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -832,14 +1326,14 @@
         function renderUsers() {
             document.getElementById('usersTableBody').innerHTML = data.users.map(user => `
                 <tr class="table-row">
-                    <td class="px-6 py-4">${user.username}</td>
-                    <td class="px-6 py-4">${user.fullName}</td>
-                    <td class="px-6 py-4">${user.email}</td>
-                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded ${user.role === 'sysadmin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'}">${user.role === 'sysadmin' ? 'System Admin' : 'Standard User'}</span></td>
-                    <td class="px-6 py-4">${(user.teamAssignments || []).map(ta => { const team = data.teams.find(t => t.id === ta.teamId); return team ? `<span class="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded mr-1 mb-1">${team.name} (${ta.permission})</span>` : ''; }).join('')}</td>
-                    <td class="px-6 py-4">
-                        <button onclick="openUserModal('${user.id}')" class="text-nhs-blue hover:text-blue-700 mr-3"><i class="fas fa-edit"></i></button>
-                        ${user.id !== '1' ? `<button onclick="confirmDelete('user', '${user.id}')" class="text-red-600 hover:text-red-700"><i class="fas fa-trash"></i></button>` : ''}
+                    <td class="px-3 md:px-6 py-3 md:py-4">${user.username}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 hidden md:table-cell">${user.fullName}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 hidden lg:table-cell">${user.email}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4"><span class="px-2 py-1 text-xs rounded ${user.role === 'sysadmin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'}">${user.role === 'sysadmin' ? 'Admin' : 'User'}</span></td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 hidden md:table-cell">${(user.teamAssignments || []).map(ta => { const team = data.teams.find(t => t.id === ta.teamId); return team ? `<span class="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded mr-1 mb-1">${team.name}</span>` : ''; }).join('')}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4">
+                        <button onclick="openUserModal('${user.id}')" class="text-nhs-blue hover:text-blue-700 mr-2 md:mr-3 p-1"><i class="fas fa-edit"></i></button>
+                        ${user.id !== '1' ? `<button onclick="confirmDelete('user', '${user.id}')" class="text-red-600 hover:text-red-700 p-1"><i class="fas fa-trash"></i></button>` : ''}
                     </td>
                 </tr>
             `).join('');
@@ -908,8 +1402,18 @@
                 const memberCount = data.users.filter(u => u.teamAssignments?.some(ta => ta.teamId === team.id)).length;
                 const assetCount = data.assets.filter(a => a.teamId === team.id).length;
                 const dataflowCount = data.dataflows.filter(d => d.teamId === team.id).length;
-                return `<tr class="table-row"><td class="px-6 py-4 font-medium">${team.name}</td><td class="px-6 py-4">${team.description || '-'}</td><td class="px-6 py-4">${memberCount}</td><td class="px-6 py-4">${assetCount}</td><td class="px-6 py-4">${dataflowCount}</td><td class="px-6 py-4"><button onclick="openTeamModal('${team.id}')" class="text-nhs-blue hover:text-blue-700 mr-3"><i class="fas fa-edit"></i></button><button onclick="confirmDelete('team', '${team.id}')" class="text-red-600 hover:text-red-700"><i class="fas fa-trash"></i></button></td></tr>`;
-            }).join('') || '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No teams created yet</td></tr>';
+                return `<tr class="table-row">
+                    <td class="px-3 md:px-6 py-3 md:py-4 font-medium">${team.name}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 hidden md:table-cell">${team.description || '-'}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4">${memberCount}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 hidden sm:table-cell">${assetCount}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 hidden sm:table-cell">${dataflowCount}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4">
+                        <button onclick="openTeamModal('${team.id}')" class="text-nhs-blue hover:text-blue-700 mr-2 md:mr-3 p-1"><i class="fas fa-edit"></i></button>
+                        <button onclick="confirmDelete('team', '${team.id}')" class="text-red-600 hover:text-red-700 p-1"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            }).join('') || '<tr><td colspan="6" class="px-3 md:px-6 py-6 md:py-8 text-center text-gray-500">No teams created yet</td></tr>';
         }
 
         function openTeamModal(teamId = null) {
@@ -992,12 +1496,12 @@
             const accessibleTeams = getAccessibleTeams();
             
             // Show key columns: Team, Asset Name, Next Review, Total Risk, Actions
-            headerRow.innerHTML = '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Owner</th>' +
-                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asset Name</th>' +
-                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Portfolio</th>' +
-                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Next Review</th>' +
-                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Risk</th>' +
-                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>';
+            headerRow.innerHTML = '<th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Owner</th>' +
+                '<th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asset Name</th>' +
+                '<th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Portfolio</th>' +
+                '<th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Next Review</th>' +
+                '<th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Risk</th>' +
+                '<th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>';
             
             let filtered = data.assets.filter(a => accessibleTeams.some(t => t.id === a.teamId));
             const search = document.getElementById('assetSearch').value.toLowerCase();
@@ -1030,14 +1534,14 @@
                 else if (reviewStatus === 'due-soon') { reviewClass = 'text-yellow-600'; reviewIcon = '<i class="fas fa-clock mr-1"></i>'; }
                 
                 return `<tr class="table-row">
-                    <td class="px-6 py-4"><span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">${team?.name || 'Unknown'}</span></td>
-                    <td class="px-6 py-4 font-medium">${asset.data?.a3 || '-'}</td>
-                    <td class="px-6 py-4">${asset.data?.a1 || '-'}</td>
-                    <td class="px-6 py-4 ${reviewClass}">${reviewIcon}${asset.data?.a7 || 'Not set'}</td>
-                    <td class="px-6 py-4"><span class="px-2 py-1 rounded text-sm font-medium ${riskClass}">${totalRisk || '-'}</span></td>
-                    <td class="px-6 py-4">
-                        <button onclick="viewAsset('${asset.id}')" class="text-gray-600 hover:text-gray-800 mr-2" title="View"><i class="fas fa-eye"></i></button>
-                        ${canEdit ? `<button onclick="openAssetModal('${asset.id}')" class="text-nhs-blue hover:text-blue-700 mr-2" title="Edit"><i class="fas fa-edit"></i></button><button onclick="confirmDelete('asset', '${asset.id}')" class="text-red-600 hover:text-red-700" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
+                    <td class="px-3 md:px-6 py-3 md:py-4"><span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">${team?.name || '?'}</span></td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 font-medium text-xs md:text-sm">${asset.data?.a3 || '-'}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 hidden md:table-cell text-xs md:text-sm">${asset.data?.a1 || '-'}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 hidden sm:table-cell ${reviewClass} text-xs md:text-sm">${reviewIcon}${asset.data?.a7 || 'Not set'}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4"><span class="px-2 py-1 rounded text-xs font-medium ${riskClass}">${totalRisk || '-'}</span></td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                        <button onclick="viewAsset('${asset.id}')" class="text-gray-600 hover:text-gray-800 mr-1 md:mr-2 p-1" title="View"><i class="fas fa-eye"></i></button>
+                        ${canEdit ? `<button onclick="openAssetModal('${asset.id}')" class="text-nhs-blue hover:text-blue-700 mr-1 md:mr-2 p-1" title="Edit"><i class="fas fa-edit"></i></button><button onclick="confirmDelete('asset', '${asset.id}')" class="text-red-600 hover:text-red-700 p-1" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
                     </td>
                 </tr>`;
             }).join('');
@@ -1207,12 +1711,12 @@
             const fields = data.formFields.dataflow || [];
             const accessibleTeams = getAccessibleTeams();
             
-            headerRow.innerHTML = '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Owner</th>' +
-                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Linked Asset</th>' +
-                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Portfolio</th>' +
-                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Next Review</th>' +
-                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Risk</th>' +
-                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>';
+            headerRow.innerHTML = '<th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Owner</th>' +
+                '<th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Linked Asset</th>' +
+                '<th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Portfolio</th>' +
+                '<th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Next Review</th>' +
+                '<th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Risk</th>' +
+                '<th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>';
             
             let filtered = data.dataflows.filter(d => accessibleTeams.some(t => t.id === d.teamId));
             const search = document.getElementById('dataflowSearch').value.toLowerCase();
@@ -1246,14 +1750,14 @@
                 else if (reviewStatus === 'due-soon') { reviewClass = 'text-yellow-600'; reviewIcon = '<i class="fas fa-clock mr-1"></i>'; }
                 
                 return `<tr class="table-row">
-                    <td class="px-6 py-4"><span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">${team?.name || 'Unknown'}</span></td>
-                    <td class="px-6 py-4">${linkedAsset ? getAssetDisplayName(linkedAsset) : '-'}</td>
-                    <td class="px-6 py-4">${df.data?.d1 || '-'}</td>
-                    <td class="px-6 py-4 ${reviewClass}">${reviewIcon}${df.data?.d7 || 'Not set'}</td>
-                    <td class="px-6 py-4"><span class="px-2 py-1 rounded text-sm font-medium ${riskClass}">${totalRisk || '-'}</span></td>
-                    <td class="px-6 py-4">
-                        <button onclick="viewDataflow('${df.id}')" class="text-gray-600 hover:text-gray-800 mr-2" title="View"><i class="fas fa-eye"></i></button>
-                        ${canEdit ? `<button onclick="openDataflowModal('${df.id}')" class="text-nhs-blue hover:text-blue-700 mr-2" title="Edit"><i class="fas fa-edit"></i></button><button onclick="confirmDelete('dataflow', '${df.id}')" class="text-red-600 hover:text-red-700" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
+                    <td class="px-3 md:px-6 py-3 md:py-4"><span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">${team?.name || '?'}</span></td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 hidden md:table-cell text-xs md:text-sm">${linkedAsset ? getAssetDisplayName(linkedAsset) : '-'}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 hidden lg:table-cell text-xs md:text-sm">${df.data?.d1 || '-'}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 hidden sm:table-cell ${reviewClass} text-xs md:text-sm">${reviewIcon}${df.data?.d7 || 'Not set'}</td>
+                    <td class="px-3 md:px-6 py-3 md:py-4"><span class="px-2 py-1 rounded text-xs font-medium ${riskClass}">${totalRisk || '-'}</span></td>
+                    <td class="px-3 md:px-6 py-3 md:py-4 whitespace-nowrap">
+                        <button onclick="viewDataflow('${df.id}')" class="text-gray-600 hover:text-gray-800 mr-1 md:mr-2 p-1" title="View"><i class="fas fa-eye"></i></button>
+                        ${canEdit ? `<button onclick="openDataflowModal('${df.id}')" class="text-nhs-blue hover:text-blue-700 mr-1 md:mr-2 p-1" title="Edit"><i class="fas fa-edit"></i></button><button onclick="confirmDelete('dataflow', '${df.id}')" class="text-red-600 hover:text-red-700 p-1" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
                     </td>
                 </tr>`;
             }).join('');
@@ -1438,3 +1942,4 @@
     </script>
 </body>
 </html>
+NHS information asset register web app - Claude
