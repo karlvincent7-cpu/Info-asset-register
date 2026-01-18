@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHS Information Asset Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .nhs-blue { background-color: #005eb8; }
+        .nhs-blue-dark { background-color: #003d78; }
+        .text-nhs-blue { color: #005eb8; }
+        .border-nhs-blue { border-color: #005eb8; }
+        .sidebar-item:hover, .sidebar-item.active { background-color: #003d78; }
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.5); }
+        .fade-in { animation: fadeIn 0.2s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .table-row:hover { background-color: #f0f4f5; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #005eb8; box-shadow: 0 0 0 2px rgba(0, 94, 184, 0.2); }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-700">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md fade-in">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 nhs-blue rounded-full mb-4">
+                    <i class="fas fa-hospital text-white text-2xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">NHS Information Asset Register</h1>
+                <p class="text-gray-500 mt-2">Sign in to continue</p>
+            </div>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                    <input type="text" id="loginUsername" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Enter username" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="loginPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Enter password" required>
+                </div>
+                <div id="loginError" class="text-red-600 text-sm hidden"></div>
+                <button type="submit" class="w-full nhs-blue text-white py-2 rounded-lg hover:bg-blue-700 transition font-medium">Sign In</button>
+            </form>
+            <p class="text-center text-gray-500 text-sm mt-6">Default: admin / admin</p>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="hidden">
+        <nav class="nhs-blue text-white shadow-lg fixed top-0 left-0 right-0 z-50">
+            <div class="flex items-center justify-between px-6 py-3">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-hospital text-xl"></i>
+                    <span class="font-bold text-lg">NHS Information Asset Register</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="currentUserDisplay" class="text-sm"></span>
+                    <button onclick="logout()" class="bg-white/20 hover:bg-white/30 px-4 py-1.5 rounded text-sm transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex pt-14">
+            <aside class="nhs-blue w-64 min-h-screen fixed left-0 top-14 overflow-y-auto">
+                <nav class="py-4">
+                    <div class="px-4 mb-2 text-blue-200 text-xs font-semibold uppercase tracking-wider">Main Menu</div>
+                    <a href="#" onclick="showSection('dashboard')" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt w-6"></i><span>Dashboard</span>
+                    </a>
+                    <a href="#" onclick="showSection('assets')" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="assets">
+                        <i class="fas fa-database w-6"></i><span>Information Assets</span>
+                    </a>
+                    <a href="#" onclick="showSection('dataflows')" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="dataflows">
+                        <i class="fas fa-exchange-alt w-6"></i><span>Data Flows</span>
+                    </a>
+                    <div id="adminMenu" class="hidden">
+                        <div class="px-4 mt-6 mb-2 text-blue-200 text-xs font-semibold uppercase tracking-wider">Administration</div>
+                        <a href="#" onclick="showSection('users')" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="users">
+                            <i class="fas fa-users w-6"></i><span>User Management</span>
+                        </a>
+                        <a href="#" onclick="showSection('teams')" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="teams">
+                            <i class="fas fa-user-friends w-6"></i><span>Team Management</span>
+                        </a>
+                        <a href="#" onclick="showSection('forms')" class="sidebar-item flex items-center px-4 py-3 text-white transition" data-section="forms">
+                            <i class="fas fa-wpforms w-6"></i><span>Forms Admin</span>
+                        </a>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="ml-64 flex-1 p-6">
+                <!-- Dashboard -->
+                <section id="dashboardSection" class="section fade-in">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Dashboard</h2>
+                    
+                    <!-- Main Stats Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div onclick="showSection('assets')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1">
+                            <div class="flex items-center justify-between">
+                                <div><p class="text-gray-500 text-sm">Total Assets</p><p id="statAssets" class="text-3xl font-bold text-nhs-blue">0</p></div>
+                                <div class="w-12 h-12 nhs-blue rounded-full flex items-center justify-center"><i class="fas fa-database text-white"></i></div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Click to view all</p>
+                        </div>
+                        <div onclick="showSection('dataflows')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1">
+                            <div class="flex items-center justify-between">
+                                <div><p class="text-gray-500 text-sm">Total Data Flows</p><p id="statDataflows" class="text-3xl font-bold text-nhs-blue">0</p></div>
+                                <div class="w-12 h-12 nhs-blue rounded-full flex items-center justify-center"><i class="fas fa-exchange-alt text-white"></i></div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Click to view all</p>
+                        </div>
+                        <div onclick="showSection('teams')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1">
+                            <div class="flex items-center justify-between">
+                                <div><p class="text-gray-500 text-sm">Teams</p><p id="statTeams" class="text-3xl font-bold text-nhs-blue">0</p></div>
+                                <div class="w-12 h-12 nhs-blue rounded-full flex items-center justify-center"><i class="fas fa-user-friends text-white"></i></div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Click to manage</p>
+                        </div>
+                        <div onclick="showSection('users')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1">
+                            <div class="flex items-center justify-between">
+                                <div><p class="text-gray-500 text-sm">Users</p><p id="statUsers" class="text-3xl font-bold text-nhs-blue">0</p></div>
+                                <div class="w-12 h-12 nhs-blue rounded-full flex items-center justify-center"><i class="fas fa-users text-white"></i></div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Click to manage</p>
+                        </div>
+                    </div>
+
+                    <!-- Review Status Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div onclick="filterDashboardAssets('overdue')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-red-500">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Assets Overdue for Review</p>
+                                    <p id="statAssetsOverdue" class="text-3xl font-bold text-red-600">0</p>
+                                </div>
+                                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-exclamation-triangle text-red-600"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Click to view overdue assets</p>
+                        </div>
+                        <div onclick="filterDashboardAssets('due-soon')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-yellow-500">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Assets Due Within 30 Days</p>
+                                    <p id="statAssetsDueSoon" class="text-3xl font-bold text-yellow-600">0</p>
+                                </div>
+                                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-clock text-yellow-600"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Click to view assets due soon</p>
+                        </div>
+                        <div onclick="filterDashboardAssets('reviewed')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-green-500">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Assets Up to Date</p>
+                                    <p id="statAssetsUpToDate" class="text-3xl font-bold text-green-600">0</p>
+                                </div>
+                                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Click to view up-to-date assets</p>
+                        </div>
+                    </div>
+
+                    <!-- Data Flow Review Status Row -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div onclick="filterDashboardDataflows('overdue')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-red-400">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Data Flows Overdue for Review</p>
+                                    <p id="statDataflowsOverdue" class="text-3xl font-bold text-red-500">0</p>
+                                </div>
+                                <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-exclamation-circle text-red-500"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Click to view overdue data flows</p>
+                        </div>
+                        <div onclick="filterDashboardDataflows('due-soon')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-yellow-400">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Data Flows Due Within 30 Days</p>
+                                    <p id="statDataflowsDueSoon" class="text-3xl font-bold text-yellow-500">0</p>
+                                </div>
+                                <div class="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-hourglass-half text-yellow-500"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Click to view data flows due soon</p>
+                        </div>
+                        <div onclick="filterDashboardDataflows('reviewed')" class="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1 border-l-4 border-green-400">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Data Flows Up to Date</p>
+                                    <p id="statDataflowsUpToDate" class="text-3xl font-bold text-green-500">0</p>
+                                </div>
+                                <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check text-green-500"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">Click to view up-to-date data flows</p>
+                        </div>
+                    </div>
+
+                    <!-- Risk Overview -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Asset Risk Overview</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">High Risk (49-64)</span>
+                                    <span id="riskHigh" class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">0</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">Medium Risk (25-48)</span>
+                                    <span id="riskMedium" class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">0</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">Low Risk (1-24)</span>
+                                    <span id="riskLow" class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Data Flow Risk Overview</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">High Risk (49-64)</span>
+                                    <span id="dfRiskHigh" class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">0</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">Medium Risk (25-48)</span>
+                                    <span id="dfRiskMedium" class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">0</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">Low Risk (1-24)</span>
+                                    <span id="dfRiskLow" class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">My Teams</h3>
+                            <div id="myTeamsList" class="space-y-2"></div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
+                            <div class="space-y-2">
+                                <button onclick="showSection('assets'); setTimeout(() => openAssetModal(), 100)" class="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                                    <i class="fas fa-plus text-nhs-blue mr-2"></i>Add Information Asset
+                                </button>
+                                <button onclick="showSection('dataflows'); setTimeout(() => openDataflowModal(), 100)" class="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                                    <i class="fas fa-plus text-nhs-blue mr-2"></i>Add Data Flow
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Information Assets -->
+                <section id="assetsSection" class="section hidden fade-in">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Information Assets</h2>
+                        <div class="flex space-x-3">
+                            <button onclick="exportAssets()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                                <i class="fas fa-download mr-2"></i>Export CSV
+                            </button>
+                            <button onclick="openAssetModal()" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas fa-plus mr-2"></i>Add Asset
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-4 border-b">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-1">
+                                    <input type="text" id="assetSearch" onkeyup="filterAssets()" placeholder="Search assets..." class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <select id="assetTeamFilter" onchange="filterAssets()" class="px-4 py-2 border border-gray-300 rounded-lg">
+                                    <option value="">All Teams</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50"><tr id="assetsTableHeader"></tr></thead>
+                                <tbody id="assetsTableBody" class="divide-y divide-gray-200"></tbody>
+                            </table>
+                        </div>
+                        <div id="noAssetsMessage" class="p-8 text-center text-gray-500 hidden">
+                            <i class="fas fa-database text-4xl mb-3"></i><p>No information assets found</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Data Flows -->
+                <section id="dataflowsSection" class="section hidden fade-in">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Data Flows</h2>
+                        <div class="flex space-x-3">
+                            <button onclick="exportDataflows()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                                <i class="fas fa-download mr-2"></i>Export CSV
+                            </button>
+                            <button onclick="openDataflowModal()" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas fa-plus mr-2"></i>Add Data Flow
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-4 border-b">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex-1">
+                                    <input type="text" id="dataflowSearch" onkeyup="filterDataflows()" placeholder="Search data flows..." class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                </div>
+                                <select id="dataflowTeamFilter" onchange="filterDataflows()" class="px-4 py-2 border border-gray-300 rounded-lg">
+                                    <option value="">All Teams</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50"><tr id="dataflowsTableHeader"></tr></thead>
+                                <tbody id="dataflowsTableBody" class="divide-y divide-gray-200"></tbody>
+                            </table>
+                        </div>
+                        <div id="noDataflowsMessage" class="p-8 text-center text-gray-500 hidden">
+                            <i class="fas fa-exchange-alt text-4xl mb-3"></i><p>No data flows found</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- User Management -->
+                <section id="usersSection" class="section hidden fade-in">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">User Management</h2>
+                        <button onclick="openUserModal()" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-plus mr-2"></i>Add User
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Full Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teams</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody" class="divide-y divide-gray-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Team Management -->
+                <section id="teamsSection" class="section hidden fade-in">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Team Management</h2>
+                        <button onclick="openTeamModal()" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-plus mr-2"></i>Add Team
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Team Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Members</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assets</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data Flows</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="teamsTableBody" class="divide-y divide-gray-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Forms Admin -->
+                <section id="formsSection" class="section hidden fade-in">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Forms Administration</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-4 border-b nhs-blue rounded-t-lg">
+                                <h3 class="text-lg font-semibold text-white">Information Asset Form Fields</h3>
+                            </div>
+                            <div class="p-4">
+                                <div id="assetFieldsList" class="space-y-2 mb-4"></div>
+                                <button onclick="openFieldModal('asset')" class="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 text-gray-500 hover:border-nhs-blue hover:text-nhs-blue transition">
+                                    <i class="fas fa-plus mr-2"></i>Add Field
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow">
+                            <div class="p-4 border-b nhs-blue rounded-t-lg">
+                                <h3 class="text-lg font-semibold text-white">Data Flow Form Fields</h3>
+                            </div>
+                            <div class="p-4">
+                                <div id="dataflowFieldsList" class="space-y-2 mb-4"></div>
+                                <button onclick="openFieldModal('dataflow')" class="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 text-gray-500 hover:border-nhs-blue hover:text-nhs-blue transition">
+                                    <i class="fas fa-plus mr-2"></i>Add Field
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div id="userModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 fade-in max-h-[90vh] overflow-y-auto">
+            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between">
+                <h3 id="userModalTitle" class="text-lg font-semibold text-white">Add User</h3>
+                <button onclick="closeUserModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="userForm" class="p-6 space-y-4">
+                <input type="hidden" id="userId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Username *</label>
+                    <input type="text" id="userUsername" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                    <input type="password" id="userPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                    <p id="passwordHint" class="text-xs text-gray-500 mt-1 hidden">Leave blank to keep existing password</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                    <input type="text" id="userFullName" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                    <input type="email" id="userEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Role *</label>
+                    <select id="userRole" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                        <option value="user">Standard User</option>
+                        <option value="sysadmin">System Administrator</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Team Assignments</label>
+                    <div id="userTeamAssignments" class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3"></div>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeUserModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Team Modal -->
+    <div id="teamModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 fade-in">
+            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between">
+                <h3 id="teamModalTitle" class="text-lg font-semibold text-white">Add Team</h3>
+                <button onclick="closeTeamModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="teamForm" class="p-6 space-y-4">
+                <input type="hidden" id="teamId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Team Name *</label>
+                    <input type="text" id="teamName" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="teamDescription" class="w-full px-4 py-2 border border-gray-300 rounded-lg" rows="3"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeTeamModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Team</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Field Modal -->
+    <div id="fieldModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 fade-in">
+            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between">
+                <h3 id="fieldModalTitle" class="text-lg font-semibold text-white">Add Field</h3>
+                <button onclick="closeFieldModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="fieldForm" class="p-6 space-y-4">
+                <input type="hidden" id="fieldId">
+                <input type="hidden" id="fieldFormType">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Field Label *</label>
+                    <input type="text" id="fieldLabel" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Field Type *</label>
+                    <select id="fieldType" onchange="toggleOptionsField()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                        <option value="text">Text (Single Line)</option>
+                        <option value="textarea">Text Area (Multi-line)</option>
+                        <option value="dropdown">Dropdown</option>
+                        <option value="date">Date</option>
+                        <option value="checkbox">Checkbox (Yes/No)</option>
+                        <option value="multiselect">Multi-select</option>
+                    </select>
+                </div>
+                <div id="optionsContainer" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Options (one per line) *</label>
+                    <textarea id="fieldOptions" class="w-full px-4 py-2 border border-gray-300 rounded-lg" rows="4" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="fieldRequired" class="mr-2">
+                    <label for="fieldRequired" class="text-sm text-gray-700">Required field</label>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeFieldModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Field</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Asset Modal -->
+    <div id="assetModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 fade-in max-h-[90vh] overflow-y-auto">
+            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0">
+                <h3 id="assetModalTitle" class="text-lg font-semibold text-white">Add Information Asset</h3>
+                <button onclick="closeAssetModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="assetForm" class="p-6 space-y-4">
+                <input type="hidden" id="assetId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Owner Team *</label>
+                    <select id="assetTeam" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></select>
+                </div>
+                <div id="assetDynamicFields"></div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeAssetModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Asset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Data Flow Modal -->
+    <div id="dataflowModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 fade-in max-h-[90vh] overflow-y-auto">
+            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0">
+                <h3 id="dataflowModalTitle" class="text-lg font-semibold text-white">Add Data Flow</h3>
+                <button onclick="closeDataflowModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="dataflowForm" class="p-6 space-y-4">
+                <input type="hidden" id="dataflowId">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Owner Team *</label>
+                    <select id="dataflowTeam" onchange="updateLinkedAssetOptions()" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Linked Information Asset</label>
+                    <select id="dataflowLinkedAsset" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="">-- None --</option>
+                    </select>
+                </div>
+                <div id="dataflowDynamicFields"></div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeDataflowModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="nhs-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Data Flow</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Asset Modal -->
+    <div id="viewAssetModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 fade-in max-h-[90vh] overflow-y-auto">
+            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0">
+                <h3 class="text-lg font-semibold text-white">View Information Asset</h3>
+                <button onclick="closeViewAssetModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="viewAssetContent" class="p-6"></div>
+        </div>
+    </div>
+
+    <!-- View Data Flow Modal -->
+    <div id="viewDataflowModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 fade-in max-h-[90vh] overflow-y-auto">
+            <div class="p-4 border-b nhs-blue rounded-t-lg flex items-center justify-between sticky top-0">
+                <h3 class="text-lg font-semibold text-white">View Data Flow</h3>
+                <button onclick="closeViewDataflowModal()" class="text-white hover:text-gray-200"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="viewDataflowContent" class="p-6"></div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-sm mx-4 fade-in">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Confirm Delete</h3>
+                <p id="confirmMessage" class="text-gray-600 mb-6"></p>
+                <div class="flex justify-center space-x-3">
+                    <button onclick="closeConfirmModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button id="confirmDeleteBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DEFAULT_DATA = {
+            users: [{ id: '1', username: 'admin', password: 'admin', fullName: 'System Administrator', email: 'admin@nhs.net', role: 'sysadmin', teamAssignments: [] }],
+            teams: [],
+            assets: [],
+            dataflows: [],
+            formFields: {
+                asset: [
+                    { id: 'a1', label: 'Portfolio', type: 'text', required: true, options: [] },
+                    { id: 'a3', label: 'Asset Name', type: 'text', required: true, options: [] },
+                    { id: 'a4', label: 'Description', type: 'textarea', required: true, options: [] },
+                    { id: 'a5', label: 'Storage Location', type: 'text', required: true, options: [] },
+                    { id: 'a6', label: 'Date Reviewed', type: 'date', required: false, options: [] },
+                    { id: 'a7', label: 'Date Next Review Due', type: 'date', required: true, options: [] },
+                    { id: 'a8', label: 'Risk Score', type: 'dropdown', required: true, options: ['1','2','3','4','5','6','7','8'] },
+                    { id: 'a9', label: 'Likelihood of Risk', type: 'dropdown', required: true, options: ['1','2','3','4','5','6','7','8'] },
+                    { id: 'a10', label: 'Total Risk', type: 'calculated', required: false, options: [], formula: 'a8*a9' }
+                ],
+                dataflow: [
+                    { id: 'd1', label: 'Portfolio', type: 'text', required: true, options: [] },
+                    { id: 'd3', label: 'Description', type: 'textarea', required: true, options: [] },
+                    { id: 'd4', label: 'Description of How Data Flows', type: 'textarea', required: true, options: [] },
+                    { id: 'd5', label: 'Storage Location', type: 'text', required: true, options: [] },
+                    { id: 'd6', label: 'Date Reviewed', type: 'date', required: false, options: [] },
+                    { id: 'd7', label: 'Date Next Review Due', type: 'date', required: true, options: [] },
+                    { id: 'd8', label: 'Risk Score', type: 'dropdown', required: true, options: ['1','2','3','4','5','6','7','8'] },
+                    { id: 'd9', label: 'Likelihood of Risk', type: 'dropdown', required: true, options: ['1','2','3','4','5','6','7','8'] },
+                    { id: 'd10', label: 'Total Risk', type: 'calculated', required: false, options: [], formula: 'd8*d9' }
+                ]
+            }
+        };
+
+        let data = JSON.parse(localStorage.getItem('nhsAssetRegister')) || JSON.parse(JSON.stringify(DEFAULT_DATA));
+        let currentUser = null;
+        let deleteContext = null;
+
+        function saveData() { localStorage.setItem('nhsAssetRegister', JSON.stringify(data)); }
+        function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
+
+        // Auth
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = data.users.find(u => u.username === document.getElementById('loginUsername').value && u.password === document.getElementById('loginPassword').value);
+            if (user) {
+                currentUser = user;
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                document.getElementById('currentUserDisplay').textContent = `${user.fullName} (${user.role === 'sysadmin' ? 'Sys Admin' : 'User'})`;
+                document.getElementById('adminMenu').classList.toggle('hidden', user.role !== 'sysadmin');
+                showSection('dashboard');
+            } else {
+                document.getElementById('loginError').textContent = 'Invalid username or password';
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        });
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        // Navigation
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(section + 'Section').classList.remove('hidden');
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`.sidebar-item[data-section="${section}"]`)?.classList.add('active');
+            if (section === 'dashboard') updateDashboard();
+            else if (section === 'assets') renderAssets();
+            else if (section === 'dataflows') renderDataflows();
+            else if (section === 'users') renderUsers();
+            else if (section === 'teams') renderTeams();
+            else if (section === 'forms') renderFormFields();
+        }
+
+        // Helpers
+        function getUserTeams() { return currentUser.teamAssignments || []; }
+        function canEditTeam(teamId) { return currentUser.role === 'sysadmin' || currentUser.teamAssignments?.find(t => t.teamId === teamId)?.permission === 'edit'; }
+        function canAccessTeam(teamId) { return currentUser.role === 'sysadmin' || currentUser.teamAssignments?.some(t => t.teamId === teamId); }
+        function getAccessibleTeams() { return currentUser.role === 'sysadmin' ? data.teams : data.teams.filter(t => currentUser.teamAssignments?.some(ta => ta.teamId === t.id)); }
+        function getEditableTeams() { return currentUser.role === 'sysadmin' ? data.teams : data.teams.filter(t => currentUser.teamAssignments?.some(ta => ta.teamId === t.id && ta.permission === 'edit')); }
+        function formatFieldValue(value, type) { if (!value) return ''; if (type === 'checkbox') return value ? 'Yes' : 'No'; if (type === 'multiselect' && Array.isArray(value)) return value.join(', '); return value; }
+        function getAssetDisplayName(asset) { return asset.data?.a3 || `Asset ${asset.id.substring(0, 6)}`; }
+
+        // Dashboard
+        function updateDashboard() {
+            const userTeams = getUserTeams();
+            const accessibleAssets = data.assets.filter(a => currentUser.role === 'sysadmin' || userTeams.some(t => t.teamId === a.teamId));
+            const accessibleDataflows = data.dataflows.filter(d => currentUser.role === 'sysadmin' || userTeams.some(t => t.teamId === d.teamId));
+            
+            // Basic stats
+            document.getElementById('statAssets').textContent = accessibleAssets.length;
+            document.getElementById('statDataflows').textContent = accessibleDataflows.length;
+            document.getElementById('statTeams').textContent = currentUser.role === 'sysadmin' ? data.teams.length : userTeams.length;
+            document.getElementById('statUsers').textContent = currentUser.role === 'sysadmin' ? data.users.length : '-';
+            
+            // Calculate review status for assets
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const thirtyDaysFromNow = new Date(today);
+            thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+            
+            let assetsOverdue = 0, assetsDueSoon = 0, assetsUpToDate = 0;
+            accessibleAssets.forEach(asset => {
+                const nextReview = asset.data?.a7 ? new Date(asset.data.a7) : null;
+                if (nextReview) {
+                    nextReview.setHours(0, 0, 0, 0);
+                    if (nextReview < today) assetsOverdue++;
+                    else if (nextReview <= thirtyDaysFromNow) assetsDueSoon++;
+                    else assetsUpToDate++;
+                } else {
+                    assetsOverdue++; // No review date = overdue
+                }
+            });
+            document.getElementById('statAssetsOverdue').textContent = assetsOverdue;
+            document.getElementById('statAssetsDueSoon').textContent = assetsDueSoon;
+            document.getElementById('statAssetsUpToDate').textContent = assetsUpToDate;
+            
+            // Calculate review status for data flows
+            let dataflowsOverdue = 0, dataflowsDueSoon = 0, dataflowsUpToDate = 0;
+            accessibleDataflows.forEach(df => {
+                const nextReview = df.data?.d7 ? new Date(df.data.d7) : null;
+                if (nextReview) {
+                    nextReview.setHours(0, 0, 0, 0);
+                    if (nextReview < today) dataflowsOverdue++;
+                    else if (nextReview <= thirtyDaysFromNow) dataflowsDueSoon++;
+                    else dataflowsUpToDate++;
+                } else {
+                    dataflowsOverdue++; // No review date = overdue
+                }
+            });
+            document.getElementById('statDataflowsOverdue').textContent = dataflowsOverdue;
+            document.getElementById('statDataflowsDueSoon').textContent = dataflowsDueSoon;
+            document.getElementById('statDataflowsUpToDate').textContent = dataflowsUpToDate;
+            
+            // Calculate risk levels for assets
+            let riskHigh = 0, riskMedium = 0, riskLow = 0;
+            accessibleAssets.forEach(asset => {
+                const riskScore = parseInt(asset.data?.a8) || 0;
+                const likelihood = parseInt(asset.data?.a9) || 0;
+                const totalRisk = riskScore * likelihood;
+                if (totalRisk >= 49) riskHigh++;
+                else if (totalRisk >= 25) riskMedium++;
+                else if (totalRisk > 0) riskLow++;
+            });
+            document.getElementById('riskHigh').textContent = riskHigh;
+            document.getElementById('riskMedium').textContent = riskMedium;
+            document.getElementById('riskLow').textContent = riskLow;
+            
+            // Calculate risk levels for data flows
+            let dfRiskHigh = 0, dfRiskMedium = 0, dfRiskLow = 0;
+            accessibleDataflows.forEach(df => {
+                const riskScore = parseInt(df.data?.d8) || 0;
+                const likelihood = parseInt(df.data?.d9) || 0;
+                const totalRisk = riskScore * likelihood;
+                if (totalRisk >= 49) dfRiskHigh++;
+                else if (totalRisk >= 25) dfRiskMedium++;
+                else if (totalRisk > 0) dfRiskLow++;
+            });
+            document.getElementById('dfRiskHigh').textContent = dfRiskHigh;
+            document.getElementById('dfRiskMedium').textContent = dfRiskMedium;
+            document.getElementById('dfRiskLow').textContent = dfRiskLow;
+            
+            // My teams list
+            const myTeamsList = document.getElementById('myTeamsList');
+            if (currentUser.role === 'sysadmin') myTeamsList.innerHTML = '<p class="text-gray-500">As System Administrator, you have access to all teams</p>';
+            else if (userTeams.length === 0) myTeamsList.innerHTML = '<p class="text-gray-500">You are not assigned to any teams</p>';
+            else myTeamsList.innerHTML = userTeams.map(ta => { const team = data.teams.find(t => t.id === ta.teamId); return team ? `<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="font-medium">${team.name}</span><span class="text-sm px-2 py-1 rounded ${ta.permission === 'edit' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">${ta.permission === 'edit' ? 'Edit' : 'Read Only'}</span></div>` : ''; }).join('');
+        }
+        
+        // Dashboard filter functions
+        let dashboardFilter = null;
+        
+        function filterDashboardAssets(filterType) {
+            dashboardFilter = filterType;
+            showSection('assets');
+            setTimeout(() => {
+                renderAssetsTableWithFilter(filterType);
+            }, 50);
+        }
+        
+        function filterDashboardDataflows(filterType) {
+            dashboardFilter = filterType;
+            showSection('dataflows');
+            setTimeout(() => {
+                renderDataflowsTableWithFilter(filterType);
+            }, 50);
+        }
+        
+        function getReviewStatus(dateStr) {
+            if (!dateStr) return 'overdue';
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const thirtyDaysFromNow = new Date(today);
+            thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+            const reviewDate = new Date(dateStr);
+            reviewDate.setHours(0, 0, 0, 0);
+            
+            if (reviewDate < today) return 'overdue';
+            if (reviewDate <= thirtyDaysFromNow) return 'due-soon';
+            return 'reviewed';
+        }
+
+        // Users
+        function renderUsers() {
+            document.getElementById('usersTableBody').innerHTML = data.users.map(user => `
+                <tr class="table-row">
+                    <td class="px-6 py-4">${user.username}</td>
+                    <td class="px-6 py-4">${user.fullName}</td>
+                    <td class="px-6 py-4">${user.email}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded ${user.role === 'sysadmin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'}">${user.role === 'sysadmin' ? 'System Admin' : 'Standard User'}</span></td>
+                    <td class="px-6 py-4">${(user.teamAssignments || []).map(ta => { const team = data.teams.find(t => t.id === ta.teamId); return team ? `<span class="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded mr-1 mb-1">${team.name} (${ta.permission})</span>` : ''; }).join('')}</td>
+                    <td class="px-6 py-4">
+                        <button onclick="openUserModal('${user.id}')" class="text-nhs-blue hover:text-blue-700 mr-3"><i class="fas fa-edit"></i></button>
+                        ${user.id !== '1' ? `<button onclick="confirmDelete('user', '${user.id}')" class="text-red-600 hover:text-red-700"><i class="fas fa-trash"></i></button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openUserModal(userId = null) {
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            renderTeamAssignments();
+            document.getElementById('passwordHint').classList.add('hidden');
+            if (userId) {
+                const user = data.users.find(u => u.id === userId);
+                if (user) {
+                    document.getElementById('userModalTitle').textContent = 'Edit User';
+                    document.getElementById('userId').value = user.id;
+                    document.getElementById('userUsername').value = user.username;
+                    document.getElementById('userFullName').value = user.fullName;
+                    document.getElementById('userEmail').value = user.email;
+                    document.getElementById('userRole').value = user.role;
+                    document.getElementById('passwordHint').classList.remove('hidden');
+                    (user.teamAssignments || []).forEach(ta => {
+                        const cb = document.querySelector(`input[data-team-id="${ta.teamId}"]`);
+                        const sel = document.querySelector(`select[data-team-id="${ta.teamId}"]`);
+                        if (cb) cb.checked = true;
+                        if (sel) { sel.value = ta.permission; sel.classList.remove('hidden'); }
+                    });
+                }
+            } else document.getElementById('userModalTitle').textContent = 'Add User';
+            document.getElementById('userModal').classList.remove('hidden');
+        }
+
+        function renderTeamAssignments() {
+            const container = document.getElementById('userTeamAssignments');
+            if (data.teams.length === 0) { container.innerHTML = '<p class="text-gray-500 text-sm">No teams available. Create teams first.</p>'; return; }
+            container.innerHTML = data.teams.map(team => `<div class="flex items-center justify-between py-2"><label class="flex items-center"><input type="checkbox" data-team-id="${team.id}" onchange="toggleTeamPermission('${team.id}')" class="mr-2"><span>${team.name}</span></label><select data-team-id="${team.id}" class="hidden px-2 py-1 text-sm border border-gray-300 rounded"><option value="readonly">Read Only</option><option value="edit">Edit</option></select></div>`).join('');
+        }
+
+        function toggleTeamPermission(teamId) {
+            const cb = document.querySelector(`input[data-team-id="${teamId}"]`);
+            const sel = document.querySelector(`select[data-team-id="${teamId}"]`);
+            sel.classList.toggle('hidden', !cb.checked);
+        }
+
+        function closeUserModal() { document.getElementById('userModal').classList.add('hidden'); }
+
+        document.getElementById('userForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userId = document.getElementById('userId').value;
+            const teamAssignments = [];
+            data.teams.forEach(team => {
+                const cb = document.querySelector(`input[data-team-id="${team.id}"]`);
+                const sel = document.querySelector(`select[data-team-id="${team.id}"]`);
+                if (cb?.checked) teamAssignments.push({ teamId: team.id, permission: sel.value });
+            });
+            const userData = { username: document.getElementById('userUsername').value, fullName: document.getElementById('userFullName').value, email: document.getElementById('userEmail').value, role: document.getElementById('userRole').value, teamAssignments };
+            if (userId) {
+                const i = data.users.findIndex(u => u.id === userId);
+                if (i !== -1) { const pw = document.getElementById('userPassword').value; data.users[i] = { ...data.users[i], ...userData, password: pw || data.users[i].password }; if (currentUser.id === userId) currentUser = data.users[i]; }
+            } else data.users.push({ id: generateId(), ...userData, password: document.getElementById('userPassword').value });
+            saveData(); closeUserModal(); renderUsers(); updateDashboard();
+        });
+
+        // Teams
+        function renderTeams() {
+            document.getElementById('teamsTableBody').innerHTML = data.teams.map(team => {
+                const memberCount = data.users.filter(u => u.teamAssignments?.some(ta => ta.teamId === team.id)).length;
+                const assetCount = data.assets.filter(a => a.teamId === team.id).length;
+                const dataflowCount = data.dataflows.filter(d => d.teamId === team.id).length;
+                return `<tr class="table-row"><td class="px-6 py-4 font-medium">${team.name}</td><td class="px-6 py-4">${team.description || '-'}</td><td class="px-6 py-4">${memberCount}</td><td class="px-6 py-4">${assetCount}</td><td class="px-6 py-4">${dataflowCount}</td><td class="px-6 py-4"><button onclick="openTeamModal('${team.id}')" class="text-nhs-blue hover:text-blue-700 mr-3"><i class="fas fa-edit"></i></button><button onclick="confirmDelete('team', '${team.id}')" class="text-red-600 hover:text-red-700"><i class="fas fa-trash"></i></button></td></tr>`;
+            }).join('') || '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No teams created yet</td></tr>';
+        }
+
+        function openTeamModal(teamId = null) {
+            document.getElementById('teamForm').reset();
+            document.getElementById('teamId').value = '';
+            if (teamId) {
+                const team = data.teams.find(t => t.id === teamId);
+                if (team) { document.getElementById('teamModalTitle').textContent = 'Edit Team'; document.getElementById('teamId').value = team.id; document.getElementById('teamName').value = team.name; document.getElementById('teamDescription').value = team.description || ''; }
+            } else document.getElementById('teamModalTitle').textContent = 'Add Team';
+            document.getElementById('teamModal').classList.remove('hidden');
+        }
+
+        function closeTeamModal() { document.getElementById('teamModal').classList.add('hidden'); }
+
+        document.getElementById('teamForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const teamId = document.getElementById('teamId').value;
+            const teamData = { name: document.getElementById('teamName').value, description: document.getElementById('teamDescription').value };
+            if (teamId) { const i = data.teams.findIndex(t => t.id === teamId); if (i !== -1) data.teams[i] = { ...data.teams[i], ...teamData }; }
+            else data.teams.push({ id: generateId(), ...teamData });
+            saveData(); closeTeamModal(); renderTeams(); updateDashboard();
+        });
+
+        // Form Fields
+        function renderFormFields() { renderFieldList('asset'); renderFieldList('dataflow'); }
+
+        function renderFieldList(formType) {
+            const container = document.getElementById(formType + 'FieldsList');
+            const fields = data.formFields[formType] || [];
+            if (fields.length === 0) { container.innerHTML = '<p class="text-gray-500 text-sm">No fields configured</p>'; return; }
+            container.innerHTML = fields.map(field => `<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><div class="flex items-center"><i class="fas fa-grip-vertical text-gray-400 mr-3"></i><div><span class="font-medium">${field.label}</span><span class="text-xs text-gray-500 ml-2">(${field.type})</span>${field.required ? '<span class="text-red-500 ml-1">*</span>' : ''}</div></div><div><button onclick="openFieldModal('${formType}', '${field.id}')" class="text-nhs-blue hover:text-blue-700 mr-2"><i class="fas fa-edit"></i></button><button onclick="confirmDelete('field', '${formType}:${field.id}')" class="text-red-600 hover:text-red-700"><i class="fas fa-trash"></i></button></div></div>`).join('');
+        }
+
+        function openFieldModal(formType, fieldId = null) {
+            document.getElementById('fieldForm').reset();
+            document.getElementById('fieldId').value = '';
+            document.getElementById('fieldFormType').value = formType;
+            document.getElementById('optionsContainer').classList.add('hidden');
+            if (fieldId) {
+                const field = data.formFields[formType]?.find(f => f.id === fieldId);
+                if (field) {
+                    document.getElementById('fieldModalTitle').textContent = 'Edit Field';
+                    document.getElementById('fieldId').value = field.id;
+                    document.getElementById('fieldLabel').value = field.label;
+                    document.getElementById('fieldType').value = field.type;
+                    document.getElementById('fieldRequired').checked = field.required;
+                    if (field.type === 'dropdown' || field.type === 'multiselect') { document.getElementById('optionsContainer').classList.remove('hidden'); document.getElementById('fieldOptions').value = (field.options || []).join('\n'); }
+                }
+            } else document.getElementById('fieldModalTitle').textContent = `Add ${formType === 'asset' ? 'Asset' : 'Data Flow'} Field`;
+            document.getElementById('fieldModal').classList.remove('hidden');
+        }
+
+        function closeFieldModal() { document.getElementById('fieldModal').classList.add('hidden'); }
+        function toggleOptionsField() { document.getElementById('optionsContainer').classList.toggle('hidden', !['dropdown', 'multiselect'].includes(document.getElementById('fieldType').value)); }
+
+        document.getElementById('fieldForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fieldId = document.getElementById('fieldId').value;
+            const formType = document.getElementById('fieldFormType').value;
+            const fieldType = document.getElementById('fieldType').value;
+            let options = [];
+            if (['dropdown', 'multiselect'].includes(fieldType)) options = document.getElementById('fieldOptions').value.split('\n').filter(o => o.trim());
+            const fieldData = { label: document.getElementById('fieldLabel').value, type: fieldType, required: document.getElementById('fieldRequired').checked, options };
+            if (!data.formFields[formType]) data.formFields[formType] = [];
+            if (fieldId) { const i = data.formFields[formType].findIndex(f => f.id === fieldId); if (i !== -1) data.formFields[formType][i] = { ...data.formFields[formType][i], ...fieldData }; }
+            else data.formFields[formType].push({ id: generateId(), ...fieldData });
+            saveData(); closeFieldModal(); renderFormFields();
+        });
+
+        // Assets
+        function renderAssets() { updateAssetTeamFilter(); renderAssetsTable(); }
+        function updateAssetTeamFilter() { document.getElementById('assetTeamFilter').innerHTML = '<option value="">All Teams</option>' + getAccessibleTeams().map(t => `<option value="${t.id}">${t.name}</option>`).join(''); }
+
+        function renderAssetsTable() { renderAssetsTableWithFilter(null); }
+        
+        function renderAssetsTableWithFilter(reviewFilter) {
+            const tbody = document.getElementById('assetsTableBody');
+            const headerRow = document.getElementById('assetsTableHeader');
+            const fields = data.formFields.asset || [];
+            const accessibleTeams = getAccessibleTeams();
+            
+            // Show key columns: Team, Asset Name, Next Review, Total Risk, Actions
+            headerRow.innerHTML = '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Owner</th>' +
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asset Name</th>' +
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Portfolio</th>' +
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Next Review</th>' +
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Risk</th>' +
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>';
+            
+            let filtered = data.assets.filter(a => accessibleTeams.some(t => t.id === a.teamId));
+            const search = document.getElementById('assetSearch').value.toLowerCase();
+            const teamFilter = document.getElementById('assetTeamFilter').value;
+            if (search) filtered = filtered.filter(a => Object.values(a.data || {}).some(v => String(v).toLowerCase().includes(search)));
+            if (teamFilter) filtered = filtered.filter(a => a.teamId === teamFilter);
+            
+            // Apply review status filter from dashboard
+            if (reviewFilter) {
+                filtered = filtered.filter(a => getReviewStatus(a.data?.a7) === reviewFilter);
+            }
+            
+            if (filtered.length === 0) { document.getElementById('noAssetsMessage').classList.remove('hidden'); tbody.innerHTML = ''; return; }
+            document.getElementById('noAssetsMessage').classList.add('hidden');
+            tbody.innerHTML = filtered.map(asset => {
+                const team = data.teams.find(t => t.id === asset.teamId);
+                const canEdit = canEditTeam(asset.teamId);
+                const riskScore = parseInt(asset.data?.a8) || 0;
+                const likelihood = parseInt(asset.data?.a9) || 0;
+                const totalRisk = riskScore * likelihood;
+                const reviewStatus = getReviewStatus(asset.data?.a7);
+                
+                let riskClass = 'bg-green-100 text-green-700';
+                if (totalRisk >= 49) riskClass = 'bg-red-100 text-red-700';
+                else if (totalRisk >= 25) riskClass = 'bg-yellow-100 text-yellow-700';
+                
+                let reviewClass = 'text-green-600';
+                let reviewIcon = '<i class="fas fa-check-circle mr-1"></i>';
+                if (reviewStatus === 'overdue') { reviewClass = 'text-red-600'; reviewIcon = '<i class="fas fa-exclamation-triangle mr-1"></i>'; }
+                else if (reviewStatus === 'due-soon') { reviewClass = 'text-yellow-600'; reviewIcon = '<i class="fas fa-clock mr-1"></i>'; }
+                
+                return `<tr class="table-row">
+                    <td class="px-6 py-4"><span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">${team?.name || 'Unknown'}</span></td>
+                    <td class="px-6 py-4 font-medium">${asset.data?.a3 || '-'}</td>
+                    <td class="px-6 py-4">${asset.data?.a1 || '-'}</td>
+                    <td class="px-6 py-4 ${reviewClass}">${reviewIcon}${asset.data?.a7 || 'Not set'}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 rounded text-sm font-medium ${riskClass}">${totalRisk || '-'}</span></td>
+                    <td class="px-6 py-4">
+                        <button onclick="viewAsset('${asset.id}')" class="text-gray-600 hover:text-gray-800 mr-2" title="View"><i class="fas fa-eye"></i></button>
+                        ${canEdit ? `<button onclick="openAssetModal('${asset.id}')" class="text-nhs-blue hover:text-blue-700 mr-2" title="Edit"><i class="fas fa-edit"></i></button><button onclick="confirmDelete('asset', '${asset.id}')" class="text-red-600 hover:text-red-700" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function filterAssets() { renderAssetsTable(); }
+
+        function renderDynamicFields(formType, containerId) {
+            const container = document.getElementById(containerId);
+            const fields = data.formFields[formType] || [];
+            if (fields.length === 0) { container.innerHTML = '<p class="text-gray-500">No form fields configured. Please configure form fields in Forms Admin.</p>'; return; }
+            container.innerHTML = fields.map(field => {
+                const req = field.required ? '<span class="text-red-500">*</span>' : '';
+                const reqAttr = field.required ? 'required' : '';
+                const inputId = `${formType}_field_${field.id}`;
+                let input = '';
+                
+                // Check if this is a calculated field
+                if (field.type === 'calculated') {
+                    input = `<input type="text" id="${inputId}" class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100" readonly>`;
+                } else {
+                    switch (field.type) {
+                        case 'text': input = `<input type="text" id="${inputId}" class="w-full px-4 py-2 border border-gray-300 rounded-lg" ${reqAttr}>`; break;
+                        case 'textarea': input = `<textarea id="${inputId}" class="w-full px-4 py-2 border border-gray-300 rounded-lg" rows="3" ${reqAttr}></textarea>`; break;
+                        case 'dropdown': 
+                            const onchangeAttr = (field.id === 'a8' || field.id === 'a9') ? 'onchange="calculateTotalRisk(\'asset\')"' : 
+                                                 (field.id === 'd8' || field.id === 'd9') ? 'onchange="calculateTotalRisk(\'dataflow\')"' : '';
+                            input = `<select id="${inputId}" class="w-full px-4 py-2 border border-gray-300 rounded-lg" ${reqAttr} ${onchangeAttr}><option value="">-- Select --</option>${(field.options || []).map(o => `<option value="${o}">${o}</option>`).join('')}</select>`; 
+                            break;
+                        case 'date': input = `<input type="date" id="${inputId}" class="w-full px-4 py-2 border border-gray-300 rounded-lg" ${reqAttr}>`; break;
+                        case 'checkbox': input = `<input type="checkbox" id="${inputId}" class="w-5 h-5">`; break;
+                        case 'multiselect': input = `<select id="${inputId}" class="w-full px-4 py-2 border border-gray-300 rounded-lg" multiple>${(field.options || []).map(o => `<option value="${o}">${o}</option>`).join('')}</select><p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>`; break;
+                    }
+                }
+                return `<div class="mb-4"><label class="block text-sm font-medium text-gray-700 mb-1">${field.label} ${req}</label>${input}</div>`;
+            }).join('');
+        }
+        
+        function calculateTotalRisk(formType) {
+            const prefix = formType === 'asset' ? 'a' : 'd';
+            const riskScore = parseInt(document.getElementById(`${formType}_field_${prefix}8`)?.value) || 0;
+            const likelihood = parseInt(document.getElementById(`${formType}_field_${prefix}9`)?.value) || 0;
+            const totalRiskField = document.getElementById(`${formType}_field_${prefix}10`);
+            if (totalRiskField) {
+                totalRiskField.value = riskScore && likelihood ? riskScore * likelihood : '';
+            }
+        }
+
+        function openAssetModal(assetId = null) {
+            document.getElementById('assetForm').reset();
+            document.getElementById('assetId').value = '';
+            const editableTeams = getEditableTeams();
+            if (editableTeams.length === 0) { alert('You do not have edit permissions for any team.'); return; }
+            document.getElementById('assetTeam').innerHTML = editableTeams.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+            renderDynamicFields('asset', 'assetDynamicFields');
+            if (assetId) {
+                const asset = data.assets.find(a => a.id === assetId);
+                if (asset) {
+                    document.getElementById('assetModalTitle').textContent = 'Edit Information Asset';
+                    document.getElementById('assetId').value = asset.id;
+                    document.getElementById('assetTeam').value = asset.teamId;
+                    Object.entries(asset.data || {}).forEach(([fid, val]) => {
+                        const field = data.formFields.asset?.find(f => f.id === fid);
+                        const input = document.getElementById(`asset_field_${fid}`);
+                        if (input) { 
+                            if (field?.type === 'checkbox') input.checked = val; 
+                            else if (field?.type === 'multiselect') Array.from(input.options).forEach(opt => { opt.selected = val?.includes(opt.value); }); 
+                            else input.value = val; 
+                        }
+                    });
+                    // Recalculate total risk
+                    calculateTotalRisk('asset');
+                }
+            } else document.getElementById('assetModalTitle').textContent = 'Add Information Asset';
+            document.getElementById('assetModal').classList.remove('hidden');
+        }
+
+        function closeAssetModal() { document.getElementById('assetModal').classList.add('hidden'); }
+
+        document.getElementById('assetForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const assetId = document.getElementById('assetId').value;
+            const teamId = document.getElementById('assetTeam').value;
+            const fieldData = {};
+            (data.formFields.asset || []).forEach(field => {
+                const input = document.getElementById(`asset_field_${field.id}`);
+                if (input) { if (field.type === 'checkbox') fieldData[field.id] = input.checked; else if (field.type === 'multiselect') fieldData[field.id] = Array.from(input.selectedOptions).map(o => o.value); else fieldData[field.id] = input.value; }
+            });
+            if (assetId) { const i = data.assets.findIndex(a => a.id === assetId); if (i !== -1) data.assets[i] = { ...data.assets[i], teamId, data: fieldData, updatedAt: new Date().toISOString() }; }
+            else data.assets.push({ id: generateId(), teamId, data: fieldData, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+            saveData(); closeAssetModal(); renderAssets(); updateDashboard();
+        });
+
+        function viewAsset(assetId) {
+            const asset = data.assets.find(a => a.id === assetId);
+            if (!asset) return;
+            const team = data.teams.find(t => t.id === asset.teamId);
+            const fields = data.formFields.asset || [];
+            const riskScore = parseInt(asset.data?.a8) || 0;
+            const likelihood = parseInt(asset.data?.a9) || 0;
+            const totalRisk = riskScore * likelihood;
+            
+            let riskClass = 'bg-green-100 text-green-700';
+            let riskLabel = 'Low Risk';
+            if (totalRisk >= 49) { riskClass = 'bg-red-100 text-red-700'; riskLabel = 'High Risk'; }
+            else if (totalRisk >= 25) { riskClass = 'bg-yellow-100 text-yellow-700'; riskLabel = 'Medium Risk'; }
+            
+            document.getElementById('viewAssetContent').innerHTML = `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4 pb-4 border-b">
+                        <div>
+                            <span class="text-sm text-gray-500">Owner Team</span>
+                            <p class="font-medium">${team?.name || 'Unknown'}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">Total Risk Score</span>
+                            <p class="font-medium"><span class="px-3 py-1 rounded ${riskClass}">${totalRisk} - ${riskLabel}</span></p>
+                        </div>
+                    </div>
+                    ${fields.filter(f => f.type !== 'calculated').map(f => `
+                        <div>
+                            <span class="text-sm text-gray-500">${f.label}</span>
+                            <p class="font-medium">${formatFieldValue(asset.data?.[f.id], f.type) || '-'}</p>
+                        </div>
+                    `).join('')}
+                    <div class="pt-4 border-t">
+                        <span class="text-sm text-gray-500">Last Updated</span>
+                        <p class="font-medium">${new Date(asset.updatedAt).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('viewAssetModal').classList.remove('hidden');
+        }
+
+        function closeViewAssetModal() { document.getElementById('viewAssetModal').classList.add('hidden'); }
+
+        function exportAssets() {
+            const fields = data.formFields.asset || [];
+            const filtered = data.assets.filter(a => getAccessibleTeams().some(t => t.id === a.teamId));
+            if (filtered.length === 0) { alert('No assets to export'); return; }
+            const headers = ['Owner Team', ...fields.filter(f => f.type !== 'calculated').map(f => f.label), 'Total Risk', 'Created', 'Updated'];
+            const rows = filtered.map(a => { 
+                const team = data.teams.find(t => t.id === a.teamId); 
+                const riskScore = parseInt(a.data?.a8) || 0;
+                const likelihood = parseInt(a.data?.a9) || 0;
+                const totalRisk = riskScore * likelihood;
+                return [
+                    team?.name || '', 
+                    ...fields.filter(f => f.type !== 'calculated').map(f => formatFieldValue(a.data?.[f.id], f.type) || ''), 
+                    totalRisk || '',
+                    new Date(a.createdAt).toLocaleDateString(), 
+                    new Date(a.updatedAt).toLocaleDateString()
+                ]; 
+            });
+            downloadCSV([headers, ...rows], 'information_assets.csv');
+        }
+
+        // Data Flows
+        function renderDataflows() { updateDataflowTeamFilter(); renderDataflowsTable(); }
+        function updateDataflowTeamFilter() { document.getElementById('dataflowTeamFilter').innerHTML = '<option value="">All Teams</option>' + getAccessibleTeams().map(t => `<option value="${t.id}">${t.name}</option>`).join(''); }
+
+        function renderDataflowsTable() { renderDataflowsTableWithFilter(null); }
+        
+        function renderDataflowsTableWithFilter(reviewFilter) {
+            const tbody = document.getElementById('dataflowsTableBody');
+            const headerRow = document.getElementById('dataflowsTableHeader');
+            const fields = data.formFields.dataflow || [];
+            const accessibleTeams = getAccessibleTeams();
+            
+            headerRow.innerHTML = '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Owner</th>' +
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Linked Asset</th>' +
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Portfolio</th>' +
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Next Review</th>' +
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Risk</th>' +
+                '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>';
+            
+            let filtered = data.dataflows.filter(d => accessibleTeams.some(t => t.id === d.teamId));
+            const search = document.getElementById('dataflowSearch').value.toLowerCase();
+            const teamFilter = document.getElementById('dataflowTeamFilter').value;
+            if (search) filtered = filtered.filter(d => Object.values(d.data || {}).some(v => String(v).toLowerCase().includes(search)));
+            if (teamFilter) filtered = filtered.filter(d => d.teamId === teamFilter);
+            
+            // Apply review status filter from dashboard
+            if (reviewFilter) {
+                filtered = filtered.filter(d => getReviewStatus(d.data?.d7) === reviewFilter);
+            }
+            
+            if (filtered.length === 0) { document.getElementById('noDataflowsMessage').classList.remove('hidden'); tbody.innerHTML = ''; return; }
+            document.getElementById('noDataflowsMessage').classList.add('hidden');
+            tbody.innerHTML = filtered.map(df => {
+                const team = data.teams.find(t => t.id === df.teamId);
+                const linkedAsset = df.linkedAssetId ? data.assets.find(a => a.id === df.linkedAssetId) : null;
+                const canEdit = canEditTeam(df.teamId);
+                const riskScore = parseInt(df.data?.d8) || 0;
+                const likelihood = parseInt(df.data?.d9) || 0;
+                const totalRisk = riskScore * likelihood;
+                const reviewStatus = getReviewStatus(df.data?.d7);
+                
+                let riskClass = 'bg-green-100 text-green-700';
+                if (totalRisk >= 49) riskClass = 'bg-red-100 text-red-700';
+                else if (totalRisk >= 25) riskClass = 'bg-yellow-100 text-yellow-700';
+                
+                let reviewClass = 'text-green-600';
+                let reviewIcon = '<i class="fas fa-check-circle mr-1"></i>';
+                if (reviewStatus === 'overdue') { reviewClass = 'text-red-600'; reviewIcon = '<i class="fas fa-exclamation-triangle mr-1"></i>'; }
+                else if (reviewStatus === 'due-soon') { reviewClass = 'text-yellow-600'; reviewIcon = '<i class="fas fa-clock mr-1"></i>'; }
+                
+                return `<tr class="table-row">
+                    <td class="px-6 py-4"><span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">${team?.name || 'Unknown'}</span></td>
+                    <td class="px-6 py-4">${linkedAsset ? getAssetDisplayName(linkedAsset) : '-'}</td>
+                    <td class="px-6 py-4">${df.data?.d1 || '-'}</td>
+                    <td class="px-6 py-4 ${reviewClass}">${reviewIcon}${df.data?.d7 || 'Not set'}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 rounded text-sm font-medium ${riskClass}">${totalRisk || '-'}</span></td>
+                    <td class="px-6 py-4">
+                        <button onclick="viewDataflow('${df.id}')" class="text-gray-600 hover:text-gray-800 mr-2" title="View"><i class="fas fa-eye"></i></button>
+                        ${canEdit ? `<button onclick="openDataflowModal('${df.id}')" class="text-nhs-blue hover:text-blue-700 mr-2" title="Edit"><i class="fas fa-edit"></i></button><button onclick="confirmDelete('dataflow', '${df.id}')" class="text-red-600 hover:text-red-700" title="Delete"><i class="fas fa-trash"></i></button>` : ''}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function filterDataflows() { renderDataflowsTable(); }
+
+        function openDataflowModal(dataflowId = null) {
+            document.getElementById('dataflowForm').reset();
+            document.getElementById('dataflowId').value = '';
+            const editableTeams = getEditableTeams();
+            if (editableTeams.length === 0) { alert('You do not have edit permissions for any team.'); return; }
+            document.getElementById('dataflowTeam').innerHTML = editableTeams.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+            renderDynamicFields('dataflow', 'dataflowDynamicFields');
+            updateLinkedAssetOptions();
+            if (dataflowId) {
+                const df = data.dataflows.find(d => d.id === dataflowId);
+                if (df) {
+                    document.getElementById('dataflowModalTitle').textContent = 'Edit Data Flow';
+                    document.getElementById('dataflowId').value = df.id;
+                    document.getElementById('dataflowTeam').value = df.teamId;
+                    updateLinkedAssetOptions();
+                    document.getElementById('dataflowLinkedAsset').value = df.linkedAssetId || '';
+                    Object.entries(df.data || {}).forEach(([fid, val]) => {
+                        const field = data.formFields.dataflow?.find(f => f.id === fid);
+                        const input = document.getElementById(`dataflow_field_${fid}`);
+                        if (input) { 
+                            if (field?.type === 'checkbox') input.checked = val; 
+                            else if (field?.type === 'multiselect') Array.from(input.options).forEach(opt => { opt.selected = val?.includes(opt.value); }); 
+                            else input.value = val; 
+                        }
+                    });
+                    // Recalculate total risk
+                    calculateTotalRisk('dataflow');
+                }
+            } else document.getElementById('dataflowModalTitle').textContent = 'Add Data Flow';
+            document.getElementById('dataflowModal').classList.remove('hidden');
+        }
+
+        function updateLinkedAssetOptions() {
+            const teamId = document.getElementById('dataflowTeam').value;
+            const teamAssets = data.assets.filter(a => a.teamId === teamId);
+            document.getElementById('dataflowLinkedAsset').innerHTML = '<option value="">-- None --</option>' + teamAssets.map(a => `<option value="${a.id}">${getAssetDisplayName(a)}</option>`).join('');
+        }
+
+        function closeDataflowModal() { document.getElementById('dataflowModal').classList.add('hidden'); }
+
+        document.getElementById('dataflowForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const dataflowId = document.getElementById('dataflowId').value;
+            const teamId = document.getElementById('dataflowTeam').value;
+            const linkedAssetId = document.getElementById('dataflowLinkedAsset').value || null;
+            const fieldData = {};
+            (data.formFields.dataflow || []).forEach(field => {
+                const input = document.getElementById(`dataflow_field_${field.id}`);
+                if (input) { if (field.type === 'checkbox') fieldData[field.id] = input.checked; else if (field.type === 'multiselect') fieldData[field.id] = Array.from(input.selectedOptions).map(o => o.value); else fieldData[field.id] = input.value; }
+            });
+            if (dataflowId) { const i = data.dataflows.findIndex(d => d.id === dataflowId); if (i !== -1) data.dataflows[i] = { ...data.dataflows[i], teamId, linkedAssetId, data: fieldData, updatedAt: new Date().toISOString() }; }
+            else data.dataflows.push({ id: generateId(), teamId, linkedAssetId, data: fieldData, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+            saveData(); closeDataflowModal(); renderDataflows(); updateDashboard();
+        });
+
+        function viewDataflow(dataflowId) {
+            const df = data.dataflows.find(d => d.id === dataflowId);
+            if (!df) return;
+            const team = data.teams.find(t => t.id === df.teamId);
+            const linkedAsset = df.linkedAssetId ? data.assets.find(a => a.id === df.linkedAssetId) : null;
+            const fields = data.formFields.dataflow || [];
+            const riskScore = parseInt(df.data?.d8) || 0;
+            const likelihood = parseInt(df.data?.d9) || 0;
+            const totalRisk = riskScore * likelihood;
+            
+            let riskClass = 'bg-green-100 text-green-700';
+            let riskLabel = 'Low Risk';
+            if (totalRisk >= 49) { riskClass = 'bg-red-100 text-red-700'; riskLabel = 'High Risk'; }
+            else if (totalRisk >= 25) { riskClass = 'bg-yellow-100 text-yellow-700'; riskLabel = 'Medium Risk'; }
+            
+            document.getElementById('viewDataflowContent').innerHTML = `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4 pb-4 border-b">
+                        <div>
+                            <span class="text-sm text-gray-500">Owner Team</span>
+                            <p class="font-medium">${team?.name || 'Unknown'}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">Linked Asset</span>
+                            <p class="font-medium">${linkedAsset ? getAssetDisplayName(linkedAsset) : 'None'}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">Total Risk Score</span>
+                            <p class="font-medium"><span class="px-3 py-1 rounded ${riskClass}">${totalRisk} - ${riskLabel}</span></p>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">Last Updated</span>
+                            <p class="font-medium">${new Date(df.updatedAt).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                    ${fields.filter(f => f.type !== 'calculated').map(f => `
+                        <div>
+                            <span class="text-sm text-gray-500">${f.label}</span>
+                            <p class="font-medium">${formatFieldValue(df.data?.[f.id], f.type) || '-'}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            document.getElementById('viewDataflowModal').classList.remove('hidden');
+        }
+
+        function closeViewDataflowModal() { document.getElementById('viewDataflowModal').classList.add('hidden'); }
+
+        function exportDataflows() {
+            const fields = data.formFields.dataflow || [];
+            const filtered = data.dataflows.filter(d => getAccessibleTeams().some(t => t.id === d.teamId));
+            if (filtered.length === 0) { alert('No data flows to export'); return; }
+            const headers = ['Owner Team', 'Linked Asset', ...fields.filter(f => f.type !== 'calculated').map(f => f.label), 'Total Risk', 'Created', 'Updated'];
+            const rows = filtered.map(df => { 
+                const team = data.teams.find(t => t.id === df.teamId); 
+                const linkedAsset = df.linkedAssetId ? data.assets.find(a => a.id === df.linkedAssetId) : null; 
+                const riskScore = parseInt(df.data?.d8) || 0;
+                const likelihood = parseInt(df.data?.d9) || 0;
+                const totalRisk = riskScore * likelihood;
+                return [
+                    team?.name || '', 
+                    linkedAsset ? getAssetDisplayName(linkedAsset) : '', 
+                    ...fields.filter(f => f.type !== 'calculated').map(f => formatFieldValue(df.data?.[f.id], f.type) || ''), 
+                    totalRisk || '',
+                    new Date(df.createdAt).toLocaleDateString(), 
+                    new Date(df.updatedAt).toLocaleDateString()
+                ]; 
+            });
+            downloadCSV([headers, ...rows], 'data_flows.csv');
+        }
+
+        // Delete
+        function confirmDelete(type, id) {
+            deleteContext = { type, id };
+            const messages = { user: 'Are you sure you want to delete this user?', team: 'Are you sure you want to delete this team? All associated assets and data flows will also be deleted.', asset: 'Are you sure you want to delete this information asset?', dataflow: 'Are you sure you want to delete this data flow?', field: 'Are you sure you want to delete this form field?' };
+            document.getElementById('confirmMessage').textContent = messages[type];
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() { document.getElementById('confirmModal').classList.add('hidden'); deleteContext = null; }
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            if (!deleteContext) return;
+            switch (deleteContext.type) {
+                case 'user': data.users = data.users.filter(u => u.id !== deleteContext.id); break;
+                case 'team':
+                    data.teams = data.teams.filter(t => t.id !== deleteContext.id);
+                    data.users.forEach(u => { u.teamAssignments = (u.teamAssignments || []).filter(ta => ta.teamId !== deleteContext.id); });
+                    data.assets = data.assets.filter(a => a.teamId !== deleteContext.id);
+                    data.dataflows = data.dataflows.filter(d => d.teamId !== deleteContext.id);
+                    break;
+                case 'asset':
+                    data.dataflows.forEach(df => { if (df.linkedAssetId === deleteContext.id) df.linkedAssetId = null; });
+                    data.assets = data.assets.filter(a => a.id !== deleteContext.id);
+                    break;
+                case 'dataflow': data.dataflows = data.dataflows.filter(d => d.id !== deleteContext.id); break;
+                case 'field': const [ft, fid] = deleteContext.id.split(':'); data.formFields[ft] = data.formFields[ft].filter(f => f.id !== fid); break;
+            }
+            saveData();
+            closeConfirmModal();
+            if (deleteContext.type === 'user') renderUsers();
+            else if (deleteContext.type === 'team') renderTeams();
+            else if (deleteContext.type === 'asset') renderAssets();
+            else if (deleteContext.type === 'dataflow') renderDataflows();
+            else if (deleteContext.type === 'field') renderFormFields();
+            updateDashboard();
+        });
+
+        // CSV Export
+        function downloadCSV(rows, filename) {
+            const csv = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        showSection('dashboard');
+    </script>
+</body>
+</html>
